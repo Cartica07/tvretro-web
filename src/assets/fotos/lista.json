@@ -1,0 +1,14 @@
+[
+  { "nombre": "producto-principal", "medida": "1600×2000 (4:5)", "que": "La TV encendida, de frente o 3/4, fondo oscuro" },
+  { "nombre": "version-wifi", "medida": "1200×1200 (1:1)", "que": "TV RETRO (Wi-Fi) sola" },
+  { "nombre": "version-lite", "medida": "1200×1200 (1:1)", "que": "TV RETRO Lite sola" },
+  { "nombre": "pantalla-texto", "medida": "1200×1200 (1:1)", "que": "Primer plano de la pantalla con un mensaje" },
+  { "nombre": "pantalla-imagen", "medida": "1200×1200 (1:1)", "que": "Pantalla mostrando una foto pixelada" },
+  { "nombre": "pantalla-gif", "medida": "1200×1200 (1:1)", "que": "Pantalla con un GIF (una foto basta; el video va aparte)" },
+  { "nombre": "pantalla-cancion", "medida": "1200×1200 (1:1)", "que": "Pantalla con una canción con letra" },
+  { "nombre": "app-1", "medida": "captura vertical", "que": "Captura de la app: pantalla de enviar texto" },
+  { "nombre": "app-2", "medida": "captura vertical", "que": "Captura de la app: canciones" },
+  { "nombre": "app-3", "medida": "captura vertical", "que": "Captura de la app: dibujo o galería" },
+  { "nombre": "empaque", "medida": "1600×1200 (4:3)", "que": "Unboxing / empaque" },
+  { "nombre": "logo", "medida": "vectorial", "que": "Logo en SVG (o PNG de 1000 px, fondo transparente)" }
+]

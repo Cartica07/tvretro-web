@@ -1,0 +1,164 @@
+/* =========================================================
+   TV RETRO · Web de ventas
+   Mismos colores que la app (css/tokens.css del repo TV_RETRO).
+   ========================================================= */
+:root {
+  color-scheme: dark;
+
+  --fondo: #0B0F14;
+  --brillo-fondo: #0F2230;
+  --superficie: #121821;
+  --superficie-alta: #1A2230;
+  --borde: #253041;
+  --borde-fuerte: #33415A;
+
+  --texto: #E6EDF3;
+  --texto-2: #8B98A8;
+
+  --acento: #4DD2FF;
+  --acento-relleno: #50C5EC;
+  --acento-presionado: #1FB6E8;
+  --acento-suave: #7FDFFF;
+  --acento-fondo: #0F2533;
+  --sobre-acento: #04121A;
+  --ok: #3DDC84;
+  --aviso: #FFB020;
+
+  --radio-sm: 8px;
+  --radio-md: 14px;
+  --radio-lg: 20px;
+  --radio-pill: 999px;
+  --toque-min: 48px;
+  --ancho-max: 1120px;
+  --margen: clamp(20px, 5vw, 40px);
+
+  --brillo-cian: 0 0 24px rgb(77 210 255 / .35), 0 0 2px rgb(77 210 255 / .6);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 76px;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background:
+    radial-gradient(900px 520px at 75% -10%, var(--brillo-fondo), transparent 70%),
+    var(--fondo);
+  background-attachment: fixed;
+  color: var(--texto);
+  font-family: var(--fuente-ui), system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Cuadrícula de píxeles muy suave detrás de todo. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgb(77 210 255 / .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(77 210 255 / .035) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 85%);
+}
+
+img, svg, video, canvas { display: block; max-width: 100%; }
+
+a { color: var(--acento); }
+a:hover { color: var(--acento-suave); }
+
+h1, h2, h3 { line-height: 1.1; letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+p { margin: 0; text-wrap: pretty; }
+
+:focus-visible {
+  outline: 3px solid var(--acento);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.contenedor {
+  width: 100%;
+  max-width: var(--ancho-max);
+  margin-inline: auto;
+  padding-inline: var(--margen);
+}
+
+.solo-lectores {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.mono { font-family: var(--fuente-pantalla), ui-monospace, monospace; }
+
+/* ---------- Botones ---------- */
+.boton {
+  --relleno: var(--acento-relleno);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: var(--toque-min);
+  padding: 12px 22px;
+  border-radius: var(--radio-pill);
+  border: 1px solid transparent;
+  font: inherit;
+  font-weight: 600;
+  font-size: 17px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .15s ease, background-color .15s ease, box-shadow .2s ease, border-color .15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.boton:active { transform: translateY(1px) scale(.99); }
+.boton svg { width: 22px; height: 22px; flex: none; }
+
+.boton-principal {
+  background: var(--relleno);
+  color: var(--sobre-acento);
+  box-shadow: var(--brillo-cian);
+}
+.boton-principal:hover { background: var(--acento); color: var(--sobre-acento); box-shadow: 0 0 36px rgb(77 210 255 / .5); }
+
+.boton-whatsapp { --relleno: var(--ok); }
+.boton-whatsapp.boton-principal { box-shadow: 0 0 24px rgb(61 220 132 / .28); }
+.boton-whatsapp.boton-principal:hover { background: #5BE89A; box-shadow: 0 0 32px rgb(61 220 132 / .42); }
+
+.boton-secundario {
+  background: transparent;
+  color: var(--texto);
+  border-color: var(--borde-fuerte);
+}
+.boton-secundario:hover { border-color: var(--acento); color: var(--acento); }
+
+/* ---------- Marcador de dato pendiente ---------- */
+.pendiente {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1.5px dashed var(--aviso);
+  border-radius: 6px;
+  background: rgb(255 176 32 / .1);
+  color: var(--aviso);
+  font-family: var(--fuente-pantalla), monospace;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

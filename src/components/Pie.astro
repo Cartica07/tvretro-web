@@ -1,0 +1,44 @@
+---
+import { sitio, esPendiente, textoPendiente } from '../lib/sitio';
+import Logo from './Logo.astro';
+
+const negocio = sitio.marca.negocio;
+const anio = new Date().getFullYear();
+const enlaceLegal = (url: string) => (esPendiente(url) ? null : url);
+const privacidad = enlaceLegal(sitio.legal.privacidad);
+const terminos = enlaceLegal(sitio.legal.terminos);
+---
+<footer class="pie">
+  <div class="contenedor pie-fila">
+    <Logo />
+    <nav aria-label="Información legal">
+      <ul>
+        <li>{privacidad ? <a href={privacidad} target="_blank" rel="noopener">Política de privacidad</a> : <span class="pendiente">PENDIENTE: enlace de privacidad</span>}</li>
+        <li>{terminos ? <a href={terminos} target="_blank" rel="noopener">Términos y condiciones</a> : <span class="pendiente">PENDIENTE: enlace de términos</span>}</li>
+      </ul>
+    </nav>
+    <p class="pie-copy">
+      © {anio} {esPendiente(negocio) ? <span class="pendiente">{textoPendiente(negocio)}</span> : negocio}
+    </p>
+  </div>
+</footer>
+
+<style>
+  .pie {
+    margin-top: 40px;
+    padding-block: 32px 40px;
+    border-top: 1px solid var(--borde);
+    background: rgb(11 15 20 / .6);
+    color: var(--texto-2);
+    font-size: 14px;
+  }
+  .pie-fila { display: grid; gap: 18px; justify-items: start; }
+  @media (min-width: 760px) {
+    .pie-fila { grid-template-columns: auto 1fr auto; align-items: center; }
+    nav { justify-self: center; }
+  }
+  ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; }
+  a { color: var(--texto-2); text-underline-offset: 3px; }
+  a:hover { color: var(--acento); }
+  .pie-copy { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+</style>

@@ -1,0 +1,85 @@
+# =====================================================================
+#  TV RETRO · Contenido de la página web
+# ---------------------------------------------------------------------
+#  Aquí cambias textos, precios, contacto y enlaces SIN tocar el código.
+#
+#  Reglas sencillas:
+#   1. No borres ni cambies los nombres que van antes de los dos puntos (:).
+#   2. Los textos van entre comillas "así".
+#   3. Lo que empiece con [PENDIENTE: ...] sale marcado en amarillo en la
+#      página hasta que lo reemplaces por el dato real.
+#   4. Si algo queda mal escrito, al construir la página te sale un aviso
+#      diciendo qué campo revisar. Nada se publica roto.
+#   5. Para ver todo lo que falta:  npm run pendientes
+# =====================================================================
+
+marca:
+  nombre: "TV RETRO"
+  # Nombre legal o marca con la que vendes (sale en el pie de página).
+  negocio: "[PENDIENTE: nombre legal o marca del negocio]"
+  # Dirección definitiva de la página (cuando tengas dominio). Ej: "https://tvretro.co"
+  dominio: "[PENDIENTE: dominio de la página]"
+
+# Lo que muestra Google y la vista previa al compartir el enlace por WhatsApp.
+seo:
+  titulo: "TV RETRO · La mini TV retro que canta, escribe y enamora"
+  descripcion: "Una mini TV de píxeles con sonido que manejas desde tu celular: canciones con letra, mensajes, fotos, GIF y alarmas. El regalo más original."
+
+contacto:
+  # Solo números, con el 57 de Colombia adelante. Ej: "573001234567"
+  whatsapp: "[PENDIENTE: número de WhatsApp]"
+  # Mensaje que ya aparece escrito cuando el cliente abre WhatsApp.
+  mensajeWhatsApp: "¡Hola! Quiero información de la TV RETRO 📺"
+  correo: "[PENDIENTE: correo de contacto]"
+  # Usuarios sin la @. Si una red no la usas, déjala vacía: "".
+  instagram: "[PENDIENTE: usuario de Instagram]"
+  tiktok: "[PENDIENTE: usuario de TikTok]"
+  facebook: "[PENDIENTE: usuario o página de Facebook]"
+
+# Tu comunidad de TikTok (sale debajo de los botones de la portada).
+tiktok:
+  # Escríbelo como quieres que se lea. Déjalo vacío ("") para ocultar la frase.
+  seguidores: "20 mil"
+
+# La pantallita animada de la portada.
+pantalla:
+  # Color de los puntos, igual al de la TV real.
+  color: "#4DD2FF"
+  # Mensajes que la TV "escribe" sola (cortos: máximo 24 letras cada uno).
+  mensajes:
+    - "¡Hola, Ana!"
+    - "Te quiero mucho"
+    - "¡Feliz cumple!"
+    - "¿Café a las 3?"
+
+portada:
+  etiqueta: "Mini TV retro con música"
+  # La palabra entre *asteriscos* sale resaltada con brillo.
+  titulo: "La mini TV que *canta*, escribe y enamora."
+  subtitulo: "Ponle canciones, mensajes, fotos y GIF desde tu celular. Un regalo que suena, brilla y saca sonrisas."
+  botonPrincipal: "Pedir por WhatsApp"
+  botonSecundario: "Ver versiones"
+  botonSonido: "Escucha cómo suena"
+  # Datos cortos que salen como "chips" debajo del título.
+  destacados:
+    - "+50 canciones incluidas"
+    - "Se maneja desde el celular"
+    - "Alarmas con tu canción"
+
+# Las dos versiones. estado: "disponible" o "proximamente".
+versiones:
+  - id: "wifi"
+    nombre: "TV RETRO"
+    estado: "disponible"
+    precio: "[PENDIENTE: precio de la TV RETRO]"
+    mensajeWhatsApp: "¡Hola! Quiero la TV RETRO (versión Wi-Fi) 📺"
+  - id: "lite"
+    nombre: "TV RETRO Lite"
+    estado: "proximamente"
+    precio: "[PENDIENTE: precio de la TV RETRO Lite]"
+    mensajeWhatsApp: "¡Hola! Me interesa la TV RETRO Lite 📺"
+
+# Páginas legales (ya existen en la app).
+legal:
+  privacidad: "https://cartica07.github.io/TV_RETRO/privacidad.html"
+  terminos: "https://cartica07.github.io/TV_RETRO/terminos.html"
