@@ -30,7 +30,7 @@ export const listaCanciones = () =>
 
 export const cargarCancion = (clave: string) =>
   unaVez('m1:' + clave, async () => {
-    const b64 = await (await fetch(BASE + `demo/canciones/${clave}.m1`)).text();
+    const b64 = await (await fetch(BASE + `demo/canciones/${clave}.m1.txt`)).text();
     return (await decodificarMusical(b64.trim())) as Grabacion;
   });
 

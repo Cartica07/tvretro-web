@@ -20,7 +20,7 @@ for (const archivo of readdirSync(origen).filter((f) => f.toLowerCase().endsWith
   try {
     const grab = grabarIno(texto);
     const m1 = await codificarMusical(grab);
-    writeFileSync(join(destino, clave + '.m1'), m1.datos);
+    writeFileSync(join(destino, clave + '.m1.txt'), m1.datos);
     indice.push({ clave, nombre: nombreDelIno(texto) || clave, duracion: grab.duracion, repetir: grab.repetir });
     console.log(`  ♪ ${archivo}: ${(grab.duracion / 1000).toFixed(1)} s, ${grab.cuadros.length} pantallas, ${(m1.bytes / 1024).toFixed(0)} KB`);
   } catch (e) {
