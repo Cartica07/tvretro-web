@@ -36,7 +36,7 @@ const ESTILOS = [
       <div class="muestra-pantalla">
         <div class="tarjeta-tv">
           <div class="oled-app">
-            <canvas id="pantallaMuestra" width="128" height="64" role="img" aria-label="Pantalla de la TV con el ejemplo elegido"></canvas>
+            <canvas id="pantallaMuestra" width="128" height="64" role="img" aria-label="Pantalla de Pepito con el ejemplo elegido"></canvas>
           </div>
         </div>
       </div>
@@ -206,9 +206,9 @@ const ESTILOS = [
             avisar(raiz, 'Ese GIF tiene un solo cuadro: pruébalo como foto.');
             return;
           }
-          avisar(raiz, 'Listo: así se vería en tu TV. No se subió a ningún lado.');
+          avisar(raiz, 'Listo: así se vería en Pepito. No se subió a ningún lado.');
         } catch (err) {
-          console.warn('[TV RETRO]', err);
+          console.warn('[Pepito]', err);
           avisar(raiz, (err as Error)?.message || 'No se pudo abrir ese archivo. Prueba con otro.');
         }
       });
@@ -272,7 +272,7 @@ const ESTILOS = [
         buzzer.tocar(grab.notas, grab.duracion, () => { marcarTocar(false); if (tipo === 'canciones') void mostrarCancion(); });
         pantalla.musical(grab, () => buzzer.tiempo());
       } catch (e) {
-        console.warn('[TV RETRO]', e);
+        console.warn('[Pepito]', e);
         marcarTocar(false);
       }
     });
@@ -297,7 +297,7 @@ const ESTILOS = [
         reloj: mostrarReloj,
         dibujos: () => { prepararDibujo(); reflejarDibujo(); },
       };
-      Promise.resolve(acciones[t]?.()).catch((e) => console.warn('[TV RETRO]', e));
+      Promise.resolve(acciones[t]?.()).catch((e) => console.warn('[Pepito]', e));
     };
     function elegir(b: HTMLButtonElement, enfocar = false) {
       for (const otra of pestanas) {

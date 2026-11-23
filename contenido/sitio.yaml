@@ -1,5 +1,5 @@
 # =====================================================================
-#  TV RETRO · Contenido de la página web
+#  Pepito · Contenido de la página web
 # ---------------------------------------------------------------------
 #  Aquí cambias textos, precios, contacto y enlaces SIN tocar el código.
 #
@@ -14,22 +14,22 @@
 # =====================================================================
 
 marca:
-  nombre: "TV RETRO"
+  nombre: "Pepito"
   # Nombre legal o marca con la que vendes (sale en el pie de página).
   negocio: "[PENDIENTE: nombre legal o marca del negocio]"
-  # Dirección definitiva de la página (cuando tengas dominio). Ej: "https://tvretro.co"
+  # Dirección definitiva de la página (cuando tengas dominio). Ej: "https://pepito.co"
   dominio: "[PENDIENTE: dominio de la página]"
 
 # Lo que muestra Google y la vista previa al compartir el enlace por WhatsApp.
 seo:
-  titulo: "TV RETRO · La mini TV retro que canta, escribe y enamora"
-  descripcion: "Una mini TV de píxeles con sonido que manejas desde tu celular: canciones con letra, mensajes, fotos, GIF y alarmas. El regalo más original."
+  titulo: "Pepito · El televisorcito retro que canta, escribe y enamora"
+  descripcion: "Pepito es una mini TV retro de píxeles con sonido que manejas desde tu celular: canciones con letra, mensajes, fotos, GIF y alarmas. El regalo más original."
 
 contacto:
   # Solo números, con el 57 de Colombia adelante. Ej: "573001234567"
   whatsapp: "[PENDIENTE: número de WhatsApp]"
   # Mensaje que ya aparece escrito cuando el cliente abre WhatsApp.
-  mensajeWhatsApp: "¡Hola! Quiero información de la TV RETRO 📺"
+  mensajeWhatsApp: "¡Hola! Quiero información de Pepito 📺"
   correo: "[PENDIENTE: correo de contacto]"
   # Usuarios sin la @. Si una red no la usas, déjala vacía: "".
   instagram: "[PENDIENTE: usuario de Instagram]"
@@ -53,7 +53,7 @@ pantalla:
 
 portada:
   # La palabra entre *asteriscos* sale resaltada con brillo.
-  titulo: "La mini TV que *canta*, escribe y enamora."
+  titulo: "Pepito, el televisorcito que *canta*, escribe y enamora."
   subtitulo: "Ponle canciones, mensajes, fotos y GIF desde tu celular. Un regalo que suena, brilla y saca sonrisas."
   botonPrincipal: "Pedir por WhatsApp"
   botonSecundario: "Ver versiones"
@@ -73,7 +73,7 @@ muestra:
     - id: "mensajes"
       nombre: "Mensajes"
       titulo: "Dile algo bonito, cuando quieras"
-      texto: "Lo escribes en la app y aparece en su TV. Ideal para un buenos días, un te quiero o un recordatorio."
+      texto: "Lo escribes en la app y aparece en Pepito. Ideal para un buenos días, un te quiero o un recordatorio."
       puntos:
         - "Varias letras y tamaños"
         - "Texto que se desplaza"
@@ -105,7 +105,7 @@ muestra:
     - id: "gif"
       nombre: "GIF"
       titulo: "GIF y animaciones"
-      texto: "Que su TV se mueva: sube tus propios GIF o elige animaciones de la galería. Se repiten solas."
+      texto: "Ponle movimiento: sube tus propios GIF o elige animaciones de la galería. Se repiten solas."
       puntos:
         - "Tus propios GIF"
         - "Animaciones listas"
@@ -120,11 +120,11 @@ muestra:
         - "Brillo y volumen a tu gusto"
 
 # Sección "Funciones". En cada una, version dice si es solo de una versión:
-# "wifi" (TV RETRO), "lite" (TV RETRO Lite) o "" (las dos).
+# "wifi" (Pepito Pro), "lite" (Pepito Lite) o "" (los dos).
 # icono: compartir, juegos, galeria, actualizar, ajustes, bluetooth.
 funciones:
-  titulo: "Hecha para usarla todos los días"
-  subtitulo: "Lo que la hace distinta a cualquier otro regalo."
+  titulo: "Hecho para usarlo todos los días"
+  subtitulo: "Lo que lo hace distinto a cualquier otro regalo."
   destacada:
     titulo: "Mándale algo aunque estés lejos"
     texto: "Lo que envías desde la app llega a su pantalla esté donde esté: en otra casa o en otra ciudad."
@@ -133,12 +133,12 @@ funciones:
     mensaje: "¡Te extraño!"
   lista:
     - icono: "compartir"
-      titulo: "Compártela con tu gente"
-      texto: "Hasta 5 personas pueden enviarle cosas a la misma TV: tu familia, tu pareja o tus amigos."
+      titulo: "Compártelo con tu gente"
+      texto: "Hasta 5 personas pueden enviarle cosas al mismo Pepito: tu familia, tu pareja o tus amigos."
       version: "wifi"
     - icono: "juegos"
       titulo: "Juega con la rueda"
-      texto: "Trae 5 juegos que se manejan con el botón y la rueda de la TV."
+      texto: "Trae 5 juegos que se manejan con el botón y la rueda de Pepito."
       version: "wifi"
     - icono: "galeria"
       titulo: "Galería lista para usar"
@@ -146,7 +146,7 @@ funciones:
       version: ""
     - icono: "actualizar"
       titulo: "Siempre al día"
-      texto: "Se actualiza sola por Wi-Fi y recibe mejoras nuevas."
+      texto: "Se actualiza solo por Wi-Fi y recibe mejoras nuevas."
       version: "wifi"
     - icono: "ajustes"
       titulo: "A tu gusto"
@@ -157,22 +157,23 @@ funciones:
       texto: "Se conecta directo a tu celular por Bluetooth, sin Wi-Fi ni cuenta. Solo necesitas internet la primera vez."
       version: "lite"
 
-# Sección "Cómo funciona" (3 pasos). Las pantallitas son las que muestra la TV real.
+# Sección "Cómo funciona" (3 pasos de Pepito Pro). Las pantallitas son las que
+# muestra el Pepito real.
 pasos:
   titulo: "Cómo funciona"
   subtitulo: "Tres pasos, y solo la primera vez."
   lista:
-    - titulo: "Conéctala a tu Wi-Fi"
-      texto: "Enchúfala y su pantalla te muestra un código QR. Escanéalo con tu celular y escoge tu red."
-    - titulo: "Vincúlala a tu cuenta"
-      texto: "Abre la app TV RETRO y escribe el código que aparece en la TV. Así queda a tu nombre."
+    - titulo: "Conéctalo a tu Wi-Fi"
+      texto: "Enchúfalo y su pantalla te muestra un código QR. Escanéalo con tu celular y escoge tu red."
+    - titulo: "Vincúlalo a tu cuenta"
+      texto: "Abre la app Pepito y escribe el código que aparece en su pantalla. Así queda a tu nombre."
     - titulo: "Envíale lo que quieras"
-      texto: "Escribe un mensaje, elige una canción o una foto, y toca Enviar a la TV."
+      texto: "Escribe un mensaje, elige una canción o una foto, y toca Enviar a Pepito."
   # Recuadro de la versión Lite, con la pantalla de emparejar copiada de su
   # firmware. Deja el título vacío ("") para ocultarlo.
   lite:
-    titulo: "¿Tienes la Lite? Es aún más fácil"
-    texto: "Enciéndela y verás un PIN en su pantalla. En la app toca «Abrir Bluetooth», elige la TV y escribe el PIN. No necesita Wi-Fi ni cuenta."
+    titulo: "¿Tienes Pepito Lite? Es aún más fácil"
+    texto: "Enciéndelo y verás un PIN en su pantalla. En la app toca «Abrir Bluetooth», elige «Pepito Lite» y escribe el PIN. No necesita Wi-Fi ni cuenta."
 
 # Videos de TikTok (se cargan solo cuando alguien les da play).
 # Pega el enlace COMPLETO del video, el que sale al abrirlo en el navegador:
@@ -180,7 +181,7 @@ pasos:
 # Si quieres menos videos, borra el bloque completo (desde el guion).
 videos:
   titulo: "Así suenan en TikTok"
-  subtitulo: "Las mismas canciones que suenan en la TV. Dale play."
+  subtitulo: "Las mismas canciones que suenan en Pepito. Dale play."
   lista:
     - enlace: "[PENDIENTE: enlace del video 1]"
       titulo: "[PENDIENTE: nombre de la canción 1]"
@@ -194,17 +195,17 @@ videos:
 # Las dos versiones. estado: "disponible" o "proximamente".
 versiones:
   - id: "wifi"
-    nombre: "TV RETRO"
+    nombre: "Pepito Pro"
     estado: "disponible"
-    precio: "[PENDIENTE: precio de la TV RETRO]"
-    mensajeWhatsApp: "¡Hola! Quiero la TV RETRO (versión Wi-Fi) 📺"
+    precio: "[PENDIENTE: precio de Pepito Pro]"
+    mensajeWhatsApp: "¡Hola! Quiero un Pepito Pro 📺"
   - id: "lite"
-    nombre: "TV RETRO Lite"
+    nombre: "Pepito Lite"
     estado: "proximamente"
-    precio: "[PENDIENTE: precio de la TV RETRO Lite]"
-    mensajeWhatsApp: "¡Hola! Me interesa la TV RETRO Lite 📺"
+    precio: "[PENDIENTE: precio de Pepito Lite]"
+    mensajeWhatsApp: "¡Hola! Me interesa Pepito Lite 📺"
 
-# Páginas legales (ya existen en la app).
+# Páginas legales (ya existen en la app; las de Pepito cubren Pro y Lite).
 legal:
-  privacidad: "https://cartica07.github.io/TV_RETRO/privacidad.html"
-  terminos: "https://cartica07.github.io/TV_RETRO/terminos.html"
+  privacidad: "https://cartica07.github.io/TV_RETRO/pepito/privacidad.html"
+  terminos: "https://cartica07.github.io/TV_RETRO/pepito/terminos.html"

@@ -8,7 +8,7 @@ import { sitio } from '../lib/sitio';
 
 const f = sitio.funciones;
 const nombreVersion = (v: string) =>
-  v === 'wifi' ? `Solo ${sitio.versiones.find((x) => x.id === 'wifi')?.nombre ?? 'TV RETRO'}` : v === 'lite' ? `Solo ${sitio.versiones.find((x) => x.id === 'lite')?.nombre ?? 'Lite'}` : '';
+  v === 'wifi' ? `Solo ${sitio.versiones.find((x) => x.id === 'wifi')?.nombre ?? 'Pepito Pro'}` : v === 'lite' ? `Solo ${sitio.versiones.find((x) => x.id === 'lite')?.nombre ?? 'Lite'}` : '';
 
 // Íconos propios, todos con el mismo trazo (24 × 24, 1,8 px).
 const ICONOS: Record<string, string> = {
@@ -39,7 +39,7 @@ const d = f.destacada;
         <div class="celular">
           <div class="cel-barra"><span></span></div>
           <div class="cel-chat">
-            <p class="cel-etiqueta">Enviar a la TV</p>
+            <p class="cel-etiqueta">Enviar a Pepito</p>
             <div class="cel-campo"><span class="cel-texto"></span><span class="cel-cursor"></span></div>
             <span class="cel-enviar">
               <svg viewBox="0 0 24 24"><path d="M4 12 20 4l-4 16-4-6.5L4 12Z" fill="currentColor" /></svg>

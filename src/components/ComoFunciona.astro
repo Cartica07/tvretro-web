@@ -23,7 +23,7 @@ const lite = p.lite?.titulo ? p.lite : null;
         <li>
           <div class="oled-app paso-pantalla">
             <canvas width="128" height="64" data-paso={pantallas[i]} role="img"
-              aria-label={['La TV muestra un código QR para conectarla a tu Wi-Fi', 'La TV muestra el código para vincularla a tu cuenta', 'La TV muestra tu mensaje'][i]}></canvas>
+              aria-label={['Pepito muestra un código QR para conectarlo a tu Wi-Fi', 'Pepito muestra el código para vincularlo a tu cuenta', 'Pepito muestra tu mensaje'][i]}></canvas>
           </div>
           <div class="paso-texto">
             <span class="paso-num" aria-hidden="true">{i + 1}</span>
@@ -40,7 +40,7 @@ const lite = p.lite?.titulo ? p.lite : null;
       <div class="lite">
         <div class="oled-app lite-pantalla">
           <canvas width="128" height="64" data-paso="emparejar" role="img"
-            aria-label="La TV Lite muestra un PIN para emparejarla con tu celular"></canvas>
+            aria-label="Pepito Lite muestra un PIN para emparejarlo con tu celular"></canvas>
         </div>
         <div class="lite-texto">
           <h3>{lite.titulo}</h3>

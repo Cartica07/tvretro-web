@@ -28,14 +28,14 @@ const videos = v.lista
               <span class="video-play" aria-hidden="true">
                 <svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5L8 5.5Z" fill="currentColor" /></svg>
               </span>
-              <span class="video-nota mono" aria-hidden="true">♫ TV RETRO</span>
+              <span class="video-nota mono" aria-hidden="true">♫ Pepito</span>
               <span class="video-titulo">
                 {esPendiente(x.titulo) ? <span class="pendiente">{textoPendiente(x.titulo)}</span> : x.titulo}
               </span>
             </button>
           ) : (
             <div class="video-portada video-vacio">
-              <span class="video-nota mono" aria-hidden="true">♫ TV RETRO</span>
+              <span class="video-nota mono" aria-hidden="true">♫ Pepito</span>
               <span class="pendiente">{textoPendiente(x.enlace)}</span>
             </div>
           )}

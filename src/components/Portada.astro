@@ -28,8 +28,8 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
 
     <div class="portada-tv">
       <figure class="tv" data-pantalla={datosPantalla}>
-        <TvMadera etiqueta="Pantalla de la TV RETRO mostrando mensajes, una foto, un GIF y una canción con letra" />
-        <figcaption class="solo-lectores">La TV RETRO de madera, con su pantalla mostrando lo que le envías desde el celular.</figcaption>
+        <TvMadera etiqueta="Pantalla de Pepito mostrando mensajes, una foto, un GIF y una canción con letra" />
+        <figcaption class="solo-lectores">Pepito, el televisorcito de madera, con su pantalla mostrando lo que le envías desde el celular.</figcaption>
       </figure>
 
       <button class="boton-sonido" type="button" aria-pressed="false" aria-describedby="nota-volumen">
@@ -42,7 +42,7 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
       </button>
     </div>
 
-    <p id="nota-volumen" class="solo-lectores">Sube el volumen: suena como la TV de verdad.</p>
+    <p id="nota-volumen" class="solo-lectores">Sube el volumen: suena como Pepito de verdad.</p>
 
     <div class="portada-acciones">
       <div class="portada-botones">
@@ -100,7 +100,7 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
       if (!corriendo || ocupada) return;
       const paso = pasos[indice];
       indice = (indice + 1) % pasos.length;
-      try { await paso.mostrar(); } catch (e) { console.warn('[TV RETRO]', e); }
+      try { await paso.mostrar(); } catch (e) { console.warn('[Pepito]', e); }
       if (corriendo && !ocupada && !sinMovimiento) temporizador = window.setTimeout(siguiente, paso.dura);
     };
     const iniciar = () => { if (corriendo) return; corriendo = true; void siguiente(); };
@@ -138,7 +138,7 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
         buzzer.tocar(grab.notas, grab.duracion, terminar);
         pantalla.musical(grab, () => buzzer.tiempo());
       } catch (e) {
-        console.warn('[TV RETRO]', e);
+        console.warn('[Pepito]', e);
         terminar();
       }
     });
@@ -173,8 +173,9 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
   }
 
   h1 {
-    font-size: clamp(38px, 9.5vw, 66px);
+    font-size: clamp(38px, 9.5vw, 60px);
     font-weight: 700;
+    text-wrap: balance;
   }
   .brillo {
     color: var(--acento);

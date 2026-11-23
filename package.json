@@ -1,7 +1,7 @@
 {
   "name": "tvretro-web",
   "version": "0.1.0",
-  "description": "Página de ventas de TV RETRO",
+  "description": "Página de ventas de Pepito",
   "scripts": {
     "dev": "node scripts/grabar-canciones.mjs && astro dev",
     "build": "node scripts/grabar-canciones.mjs && astro build",

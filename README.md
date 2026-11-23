@@ -1,6 +1,6 @@
-# TV RETRO · Página de ventas
+# Pepito · Página de ventas
 
-Página web de ventas de **TV RETRO**, la mini TV retro de píxeles con sonido.
+Página web de ventas de **Pepito** (antes TV RETRO), el televisorcito retro de píxeles con sonido, en sus dos versiones: Pepito Pro (Wi-Fi) y Pepito Lite (Bluetooth).
 Hecha con [Astro](https://astro.build): el resultado es una página estática, rápida y que se puede alojar gratis.
 
 ## Cambiar textos, precios y contacto
