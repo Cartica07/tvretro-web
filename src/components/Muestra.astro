@@ -133,6 +133,7 @@ const ESTILOS = [
   import { PantallaApp } from '../scripts/oled/pantallaApp';
   import { buzzer } from '../scripts/oled/buzzer';
   import { fotoDemo, convertirFoto, gifDemo, cuadrosGif, listaCanciones, cargarCancion, leerArchivoVisitante, type Original } from '../scripts/oled/contenidos';
+  import { mostrarRelojYAlarma } from '../scripts/oled/pantallaFirmware';
   import { inicializarDibujo, establecerGrosor, deshacerTrazo, limpiarLienzo, obtenerResultadoImagen } from '../app-tvretro/dibujo.js';
 
   const lienzo = document.getElementById('pantallaMuestra') as HTMLCanvasElement | null;
@@ -278,24 +279,15 @@ const ESTILOS = [
       }
     });
 
-    /* ---------- Reloj ---------- */
-    let relojId = 0;
-    const mostrarReloj = () => {
-      const pinta = () => {
-        if (tipo !== 'reloj') return;
-        const d = new Date();
-        const hh = String(d.getHours()).padStart(2, '0');
-        const mm = String(d.getMinutes()).padStart(2, '0');
-        pantalla.texto({ texto: `${hh}:${mm}`, fuente: 'clasica', tamano: 4 }, false);
-        relojId = window.setTimeout(pinta, 1000);
-      };
-      pinta();
-    };
+    /* ---------- Reloj (copiado del firmware: mostrarReloj y la alarma) ---------- */
+    let pararReloj: (() => void) | null = null;
+    const mostrarReloj = () => { pararReloj = mostrarRelojYAlarma(pantalla); };
 
     /* ---------- Pestañas ---------- */
     const pestanas = [...document.querySelectorAll<HTMLButtonElement>('.pestanas [role="tab"]')];
     const mostrar = (t: string) => {
-      clearTimeout(relojId);
+      pararReloj?.();
+      pararReloj = null;
       if (sonandoAqui) buzzer.detener();
       pantalla.detener();
       tipo = t;

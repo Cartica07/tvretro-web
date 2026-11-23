@@ -16,3 +16,10 @@ canciones **igual que la app**.
 **No los edites aquí.** Si la app cambia, vuelve a copiarlos desde el repo de la app.
 Lo que no viene de estos archivos (los tiempos del scroll, del GIF y de la
 canción) está copiado de `js/main.js` en `src/scripts/oled/pantallaApp.ts`.
+
+## Pantallas del firmware
+
+El reloj y la alarma no los dibuja la app sino el firmware. Están copiados de
+`Firmware-TV-RETRO` (rama `main`, commit `b0823a4`): `OLED_Remota/pantalla.cpp`
+(`mostrarReloj`) y `OLED_Remota/alarma.cpp` (`dibujar`), con las mismas rutinas de
+Adafruit GFX. Viven en `src/scripts/oled/pantallaFirmware.ts`.
