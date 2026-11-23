@@ -175,6 +175,20 @@ export function dibujarPortalQr() {
 }
 
 /** pantalla.cpp → mostrarEmparejamiento(EMP_MOSTRANDO, codigo, segundos), sin el desvío anti-quemado. */
+/**
+ * Versión Lite: la ventana de emparejamiento (rama lite de Firmware-TV-RETRO,
+ * OLED_Lite/OLED_Lite.ino → dibujarEmparejar(), commit d7dd563). El PIN de
+ * 6 dígitos sale solo en la pantalla y la ventana dura 5 minutos.
+ */
+export function dibujarEmparejarLite(pin: string, segundosRestantes: number) {
+  gfx.limpiar();
+  gfx.print('Emparejar: escribe el', 0, 0, 1); // println: x = 0, y += 8
+  gfx.print('PIN en tu celular', 0, 8, 1);
+  gfx.print(pin, 8, 26, 2);
+  gfx.print(`Vence en ${div(segundosRestantes, 60)}:${String(segundosRestantes % 60).padStart(2, '0')}`, 0, 56, 1);
+  return bitmapABase64(gfx.buf.slice());
+}
+
 export function dibujarVincular(codigo: string, segundosRestantes: number) {
   gfx.limpiar();
   const centrado = (t: string, y: number, tam: number) => gfx.print(t, div(ANCHO - gfx.ancho(t, tam), 2), y, tam);

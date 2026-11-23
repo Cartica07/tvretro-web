@@ -151,10 +151,10 @@ funciones:
     - icono: "ajustes"
       titulo: "A tu gusto"
       texto: "Ajusta el brillo, el volumen y la zona horaria desde la app."
-      version: "wifi"
+      version: ""
     - icono: "bluetooth"
       titulo: "Sin internet"
-      texto: "Se conecta directo a tu celular por Bluetooth: no necesita Wi-Fi."
+      texto: "Se conecta directo a tu celular por Bluetooth, sin Wi-Fi ni cuenta. Solo necesitas internet la primera vez."
       version: "lite"
 
 # Sección "Cómo funciona" (3 pasos). Las pantallitas son las que muestra la TV real.
@@ -168,8 +168,11 @@ pasos:
       texto: "Abre la app TV RETRO y escribe el código que aparece en la TV. Así queda a tu nombre."
     - titulo: "Envíale lo que quieras"
       texto: "Escribe un mensaje, elige una canción o una foto, y toca Enviar a la TV."
-  # Frase para la versión Lite (déjala vacía "" para ocultarla).
-  notaLite: "¿Tienes la Lite? Es aún más fácil: se empareja con tu celular por Bluetooth desde la misma app."
+  # Recuadro de la versión Lite, con la pantalla de emparejar copiada de su
+  # firmware. Deja el título vacío ("") para ocultarlo.
+  lite:
+    titulo: "¿Tienes la Lite? Es aún más fácil"
+    texto: "Enciéndela y verás un PIN en su pantalla. En la app toca «Abrir Bluetooth», elige la TV y escribe el PIN. No necesita Wi-Fi ni cuenta."
 
 # Videos de TikTok (se cargan solo cuando alguien les da play).
 # Pega el enlace COMPLETO del video, el que sale al abrirlo en el navegador:

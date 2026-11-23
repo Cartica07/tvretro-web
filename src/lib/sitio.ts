@@ -80,7 +80,8 @@ const esquema = z.object({
     titulo: texto,
     subtitulo: opcional,
     lista: z.array(z.object({ titulo: texto, texto: texto })).length(3, 'Deben ser exactamente 3 pasos'),
-    notaLite: opcional,
+    // Recuadro de la Lite (con su pantalla de emparejar). Título vacío = se oculta.
+    lite: z.object({ titulo: opcional, texto: opcional }).optional(),
   }),
   videos: z.object({
     titulo: texto,
