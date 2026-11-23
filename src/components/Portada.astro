@@ -1,5 +1,5 @@
 ---
-import { sitio, enlaceRed, esPendiente } from '../lib/sitio';
+import { sitio, enlaceRed } from '../lib/sitio';
 import BotonWhatsApp from './BotonWhatsApp.astro';
 import TvMadera from './TvMadera.astro';
 
@@ -15,11 +15,15 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
 <section class="portada" id="inicio" aria-labelledby="portada-titulo">
   <div class="contenedor portada-grid">
     <div class="portada-texto">
-      <p class="portada-etiqueta mono"><span class="punto" aria-hidden="true"></span>{p.etiqueta}</p>
       <h1 id="portada-titulo">
         {partesTitulo.map((x) => (x.brillo ? <span class="brillo">{x.t}</span> : x.t))}
       </h1>
       <p class="portada-subtitulo">{p.subtitulo}</p>
+      {p.destacados.length > 0 && (
+        <ul class="destacados" aria-label="Lo más destacado">
+          {p.destacados.map((d) => <li>{d}</li>)}
+        </ul>
+      )}
     </div>
 
     <div class="portada-tv">
@@ -28,40 +32,40 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
         <figcaption class="solo-lectores">La TV RETRO de madera, con su pantalla mostrando lo que le envías desde el celular.</figcaption>
       </figure>
 
-      <button class="boton-sonido" type="button" aria-pressed="false">
+      <button class="boton-sonido" type="button" aria-pressed="false" aria-describedby="nota-volumen">
         <span class="bs-icono" aria-hidden="true">
           <svg class="bs-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5L8 5.5Z" fill="currentColor" /></svg>
           <span class="bs-barras"><i></i><i></i><i></i></span>
         </span>
         <span class="bs-texto" data-tocar={p.botonSonido} data-detener="Detener">{p.botonSonido}</span>
+        <svg class="bs-parlante" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4v-5Z" fill="currentColor" /><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
       </button>
-      <p class="bs-nota">Sube el volumen: suena como la TV de verdad.</p>
     </div>
 
+    <p id="nota-volumen" class="solo-lectores">Sube el volumen: suena como la TV de verdad.</p>
+
     <div class="portada-acciones">
-        {p.destacados.length > 0 && (
-          <ul class="destacados" aria-label="Lo más destacado">
-            {p.destacados.map((d) => <li>{d}</li>)}
-          </ul>
-        )}
       <div class="portada-botones">
         <BotonWhatsApp texto={p.botonPrincipal} />
         <a class="boton boton-secundario" href="#versiones">{p.botonSecundario}</a>
       </div>
-      {seguidores && (
+    </div>
+
+    {seguidores && (
+      <div class="portada-social">
         <p class="prueba-social">
-          <span class="ps-numero mono">+{seguidores}</span>
+          <span class="ps-numero">+{seguidores}</span>
           <span>
             personas siguen sus canciones en TikTok.{' '}
             {tiktok ? (
               <a href={tiktok} target="_blank" rel="noopener">Escúchalas aquí</a>
             ) : (
-              <span class="pendiente">{esPendiente(sitio.contacto.tiktok) ? 'PENDIENTE: usuario de TikTok' : ''}</span>
+              <span class="pendiente">PENDIENTE: usuario de TikTok</span>
             )}
           </span>
         </p>
-      )}
-    </div>
+      </div>
+    )}
   </div>
 </section>
 
@@ -146,9 +150,11 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
 
   .portada-grid {
     display: grid;
-    gap: 28px;
-    grid-template-areas: "texto" "tv" "acciones";
+    gap: 24px;
+    /* 1: en celular, los botones van antes de la TV para que se vean en la primera pantalla */
+    grid-template-areas: "texto" "acciones" "tv" "social";
   }
+  .portada-social { grid-area: social; }
   .portada-texto { grid-area: texto; }
   .portada-tv { grid-area: tv; }
   .portada-acciones { grid-area: acciones; }
@@ -156,35 +162,15 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
   @media (min-width: 900px) {
     .portada-grid {
       grid-template-columns: 1.05fr 1fr;
-      grid-template-areas: "texto tv" "acciones tv";
+      grid-template-areas: "texto tv" "acciones tv" "social tv";
       column-gap: 56px;
       row-gap: 32px;
       align-items: center;
     }
     .portada-texto { align-self: end; }
     .portada-acciones { align-self: start; }
+    .portada-social { align-self: start; margin-top: -10px; }
   }
-
-  .portada-etiqueta {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 18px;
-    padding: 6px 14px;
-    border: 1px solid var(--borde);
-    border-radius: var(--radio-pill);
-    background: rgb(18 24 33 / .7);
-    color: var(--acento);
-    font-size: 13px;
-    letter-spacing: .04em;
-  }
-  .punto {
-    width: 8px; height: 8px;
-    background: var(--acento);
-    box-shadow: 0 0 10px var(--acento);
-    animation: latido 1.6s steps(2, jump-none) infinite;
-  }
-  @keyframes latido { 50% { opacity: .25; } }
 
   h1 {
     font-size: clamp(38px, 9.5vw, 66px);
@@ -201,21 +187,25 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
     font-size: clamp(17px, 2.2vw, 20px);
   }
 
+  /* 5: los datos clave, como una línea de texto y no como cajitas */
   .destacados {
     list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 0 0 22px;
+    margin: 14px 0 0;
+    line-height: 1.7;
     padding: 0;
-  }
-  .destacados li {
-    padding: 5px 11px;
-    border-radius: var(--radio-sm);
-    background: var(--superficie);
-    border: 1px solid var(--borde);
-    font-size: 13.5px;
+    color: var(--texto);
+    font-size: 15px;
     font-weight: 600;
+  }
+  .destacados li { display: inline; }
+  .destacados li:not(:last-child)::after {
+    content: "";
+    display: inline-block;
+    width: 5px; height: 5px;
+    margin: 0 10px;
+    vertical-align: middle;
+    background: var(--acento);
+    box-shadow: 0 0 6px var(--acento);
   }
 
   /* ---------- La TV ---------- */
@@ -224,6 +214,25 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
   .tv {
     margin: 0;
     width: min(100%, 440px);
+  }
+  /* 2: en celular, la TV de cerca: la pantalla queda de ~200 px de ancho y las patas se cortan */
+  @media (max-width: 599px) {
+    .tv {
+      width: calc(100% + 2 * var(--margen));
+      margin-inline: calc(-1 * var(--margen));
+      aspect-ratio: 1 / 0.92;
+      overflow: hidden;
+      position: relative;
+    }
+    .tv :global(.tvm) { width: 158%; margin-left: -7.2%; margin-top: -9%; }
+    .tv::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 18%;
+      background: linear-gradient(to bottom, transparent, var(--fondo));
+      pointer-events: none;
+    }
   }
 
   /* ---------- Botón de sonido ---------- */
@@ -240,9 +249,14 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
     font: inherit;
     font-weight: 600;
     cursor: pointer;
-    transition: border-color .15s ease, box-shadow .2s ease;
+    transition: border-color .15s ease, box-shadow .2s ease, transform 160ms var(--salida);
   }
-  .boton-sonido:hover, .boton-sonido[aria-pressed="true"] { border-color: var(--acento); box-shadow: var(--brillo-cian); }
+  .boton-sonido[aria-pressed="true"] { border-color: var(--acento); box-shadow: var(--brillo-cian); }
+  @media (hover: hover) and (pointer: fine) {
+    .boton-sonido:hover { border-color: var(--acento); box-shadow: var(--brillo-cian); }
+  }
+  .boton-sonido:active { transform: scale(.97); }
+  .bs-parlante { width: 20px; height: 20px; color: var(--texto-2); margin-left: -2px; }
   .bs-icono {
     display: grid;
     place-items: center;
@@ -259,7 +273,6 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
   @keyframes barra { from { height: 4px; } to { height: 14px; } }
   .boton-sonido[aria-pressed="true"] .bs-play { display: none; }
   .boton-sonido[aria-pressed="true"] .bs-barras { display: flex; }
-  .bs-nota { color: var(--texto-2); font-size: 13px; }
 
   /* ---------- Acciones ---------- */
   .portada-botones { display: grid; gap: 12px; }
@@ -270,7 +283,6 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
     display: flex;
     align-items: center;
     gap: 14px;
-    margin-top: 22px;
     color: var(--texto-2);
     font-size: 15px;
   }

@@ -37,7 +37,6 @@ const esquema = z.object({
     mensajes: z.array(z.string().max(60, 'Máximo 60 letras por mensaje')).min(1),
   }),
   portada: z.object({
-    etiqueta: texto,
     titulo: texto,
     subtitulo: texto,
     botonPrincipal: texto,

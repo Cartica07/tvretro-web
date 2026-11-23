@@ -7,12 +7,9 @@ import { sitio, esPendiente, textoPendiente, idVideoTikTok, enlaceRed } from '..
 
 const v = sitio.videos;
 const perfil = enlaceRed('tiktok');
-const videos = v.lista.map((x, i) => ({
-  n: i + 1,
-  id: esPendiente(x.enlace) ? null : idVideoTikTok(x.enlace),
-  enlace: x.enlace,
-  titulo: x.titulo,
-}));
+const videos = v.lista
+  .map((x, i) => ({ n: i + 1, id: esPendiente(x.enlace) ? null : idVideoTikTok(x.enlace), enlace: x.enlace, titulo: x.titulo }))
+  .filter((x) => x.id);
 ---
 {videos.length > 0 && (
   <section class="videos" id="tiktok" aria-labelledby="videos-titulo">
@@ -110,9 +107,12 @@ const videos = v.lista.map((x, i) => ({
       radial-gradient(120% 60% at 50% 0%, rgb(77 210 255 / .18), transparent 60%),
       repeating-linear-gradient(to bottom, rgb(77 210 255 / .05) 0 2px, transparent 2px 6px),
       var(--superficie);
-    transition: border-color .15s ease, box-shadow .2s ease;
+    transition: border-color .15s ease, box-shadow .2s ease, transform 160ms var(--salida);
   }
-  .video-portada:hover { border-color: var(--acento); box-shadow: var(--brillo-cian); }
+  @media (hover: hover) and (pointer: fine) {
+    .video-portada:hover { border-color: var(--acento); box-shadow: var(--brillo-cian); }
+  }
+  .video-portada:active { transform: scale(.98); }
   .video-play {
     display: grid;
     place-items: center;

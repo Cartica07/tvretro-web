@@ -52,14 +52,13 @@ pantalla:
     - "¿Café a las 3?"
 
 portada:
-  etiqueta: "Mini TV retro con música"
   # La palabra entre *asteriscos* sale resaltada con brillo.
   titulo: "La mini TV que *canta*, escribe y enamora."
   subtitulo: "Ponle canciones, mensajes, fotos y GIF desde tu celular. Un regalo que suena, brilla y saca sonrisas."
   botonPrincipal: "Pedir por WhatsApp"
   botonSecundario: "Ver versiones"
   botonSonido: "Escucha cómo suena"
-  # Datos cortos que salen como "chips" debajo del título.
+  # Datos cortos que salen en una línea debajo del subtítulo.
   destacados:
     - "+50 canciones incluidas"
     - "Se maneja desde el celular"

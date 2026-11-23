@@ -32,6 +32,9 @@
   --ancho-max: 1120px;
   --margen: clamp(20px, 5vw, 40px);
 
+  /* Curva de salida (emil-design-eng): arranca rápido y frena suave. */
+  --salida: cubic-bezier(0.23, 1, 0.32, 1);
+
   --brillo-cian: 0 0 24px rgb(77 210 255 / .35), 0 0 2px rgb(77 210 255 / .6);
 }
 
@@ -74,7 +77,9 @@ body::before {
 img, svg, video, canvas { display: block; max-width: 100%; }
 
 a { color: var(--acento); }
-a:hover { color: var(--acento-suave); }
+@media (hover: hover) and (pointer: fine) {
+  a:hover { color: var(--acento-suave); }
+}
 
 h1, h2, h3 { line-height: 1.1; letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
 p { margin: 0; text-wrap: pretty; }
@@ -118,10 +123,10 @@ p { margin: 0; text-wrap: pretty; }
   font-size: 17px;
   text-decoration: none;
   cursor: pointer;
-  transition: transform .15s ease, background-color .15s ease, box-shadow .2s ease, border-color .15s ease;
+  transition: transform 160ms var(--salida), background-color .15s ease, box-shadow .2s ease, border-color .15s ease, color .15s ease;
   -webkit-tap-highlight-color: transparent;
 }
-.boton:active { transform: translateY(1px) scale(.99); }
+.boton:active { transform: scale(.97); }
 .boton svg { width: 22px; height: 22px; flex: none; }
 
 .boton-principal {
@@ -129,18 +134,24 @@ p { margin: 0; text-wrap: pretty; }
   color: var(--sobre-acento);
   box-shadow: var(--brillo-cian);
 }
-.boton-principal:hover { background: var(--acento); color: var(--sobre-acento); box-shadow: 0 0 36px rgb(77 210 255 / .5); }
+@media (hover: hover) and (pointer: fine) {
+  .boton-principal:hover { background: var(--acento); color: var(--sobre-acento); box-shadow: 0 0 36px rgb(77 210 255 / .5); }
+}
 
 .boton-whatsapp { --relleno: var(--ok); }
 .boton-whatsapp.boton-principal { box-shadow: 0 0 24px rgb(61 220 132 / .28); }
-.boton-whatsapp.boton-principal:hover { background: #5BE89A; box-shadow: 0 0 32px rgb(61 220 132 / .42); }
+@media (hover: hover) and (pointer: fine) {
+  .boton-whatsapp.boton-principal:hover { background: #5BE89A; box-shadow: 0 0 32px rgb(61 220 132 / .42); }
+}
 
 .boton-secundario {
   background: transparent;
   color: var(--texto);
   border-color: var(--borde-fuerte);
 }
-.boton-secundario:hover { border-color: var(--acento); color: var(--acento); }
+@media (hover: hover) and (pointer: fine) {
+  .boton-secundario:hover { border-color: var(--acento); color: var(--acento); }
+}
 
 /* ---------- Marcador de dato pendiente ---------- */
 .pendiente {

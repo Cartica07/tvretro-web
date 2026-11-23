@@ -38,7 +38,6 @@ const ESTILOS = [
           <div class="oled-app">
             <canvas id="pantallaMuestra" width="128" height="64" role="img" aria-label="Pantalla de la TV con el ejemplo elegido"></canvas>
           </div>
-          <p class="pie-pantalla mono">Así se ve en la TV</p>
         </div>
       </div>
 
@@ -81,7 +80,6 @@ const ESTILOS = [
                   <span class="bt-icono" aria-hidden="true"></span>
                   <span class="bt-texto" data-tocar="Escúchala con su letra" data-detener="Detener">Escúchala con su letra</span>
                 </button>
-                <p class="nota">Ejemplo: "Cumpleaños feliz". La TV trae más de 50 canciones listas.</p>
               </div>
             )}
 
@@ -355,9 +353,12 @@ const ESTILOS = [
     font-weight: 600;
     font-size: 15px;
     cursor: pointer;
-    transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+    transition: color .15s ease, border-color .15s ease, background-color .15s ease, transform 160ms var(--salida);
   }
-  .pestanas button:hover { color: var(--texto); border-color: var(--borde-fuerte); }
+  @media (hover: hover) and (pointer: fine) {
+    .pestanas button:hover { color: var(--texto); border-color: var(--borde-fuerte); }
+  }
+  .pestanas button:active { transform: scale(.97); }
   .pestanas button[aria-selected="true"] {
     color: var(--sobre-acento);
     background: var(--acento-relleno);
@@ -367,20 +368,24 @@ const ESTILOS = [
   @media (min-width: 900px) { .pestanas { margin-inline: 0; padding-inline: 0; flex-wrap: wrap; } }
 
   .muestra-cuerpo { display: grid; gap: 20px; margin-top: 18px; align-items: start; }
+  /* La pantalla se queda a la vista mientras escribes, eliges o dibujas. */
+  .muestra-pantalla { position: sticky; top: 72px; z-index: 5; }
+  @media (max-width: 899px) {
+    .muestra-pantalla { margin-inline: calc(-1 * var(--margen)); padding: 8px var(--margen); background: linear-gradient(var(--fondo) 85%, transparent); }
+  }
   @media (min-width: 900px) {
     .muestra-cuerpo { grid-template-columns: 1.1fr 1fr; gap: 48px; margin-top: 28px; }
-    .muestra-pantalla { position: sticky; top: 88px; }
+    .muestra-pantalla { top: 88px; }
   }
 
   /* Tarjeta como la del dispositivo en la app. */
   .tarjeta-tv {
-    padding: 12px 12px 8px;
+    padding: 12px;
     border-radius: var(--radio-lg);
     border: 1px solid var(--borde);
     background: linear-gradient(155deg, var(--superficie-alta), var(--superficie) 55%);
     box-shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 12px 32px -16px rgba(0, 0, 0, .7), 0 0 60px -24px rgb(77 210 255 / .35);
   }
-  .pie-pantalla { margin-top: 8px; text-align: center; color: var(--texto-2); font-size: 12px; letter-spacing: .03em; }
 
   .muestra-panel h3 { font-size: clamp(24px, 3.4vw, 32px); }
   .panel-texto { margin-top: 10px; color: var(--texto-2); font-size: 17px; max-width: 44ch; }
@@ -416,7 +421,8 @@ const ESTILOS = [
   .segmentos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: var(--radio-sm); background: #0E141C; border: 1px solid var(--borde); }
   .segmentos label { position: relative; }
   .segmentos input { position: absolute; opacity: 0; inset: 0; }
-  .segmentos span { display: grid; place-items: center; min-height: 40px; border-radius: 6px; font-weight: 600; font-size: 15px; color: var(--texto-2); cursor: pointer; }
+  .segmentos span { display: grid; place-items: center; min-height: 40px; border-radius: 6px; font-weight: 600; font-size: 15px; color: var(--texto-2); cursor: pointer; transition: transform 160ms var(--salida), background-color .15s ease, color .15s ease; }
+  .segmentos label:active span { transform: scale(.97); }
   .segmentos input:checked + span { background: var(--acento-relleno); color: var(--sobre-acento); }
   .segmentos input:focus-visible + span { outline: 3px solid var(--acento); outline-offset: 2px; }
 
