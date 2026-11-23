@@ -1,8 +1,20 @@
 ---
+/**
+ * "Mira lo que puede mostrar": cada pestaña usa el MISMO código de la app
+ * (src/app-tvretro/) para dibujar la pantalla, y se puede probar con lo propio:
+ * escribir un mensaje, elegir una foto o un GIF, dibujar, o escuchar una canción.
+ */
 import { sitio } from '../lib/sitio';
 
 const m = sitio.muestra;
-const datos = JSON.stringify({ color: sitio.pantalla.color, mensajes: sitio.pantalla.mensajes });
+const mensajeInicial = sitio.pantalla.mensajes[0] ?? '¡Hola!';
+const ESTILOS = [
+  ['sans', 'Sans'],
+  ['sansb', 'Sans negrita'],
+  ['serif', 'Serif'],
+  ['serifi', 'Serif cursiva'],
+  ['clasica', 'Clásica'],
+];
 ---
 <section class="muestra" id="muestra" aria-labelledby="muestra-titulo">
   <div class="contenedor">
@@ -13,89 +25,291 @@ const datos = JSON.stringify({ color: sitio.pantalla.color, mensajes: sitio.pant
 
     <div class="pestanas" role="tablist" aria-label="Tipos de contenido">
       {m.tipos.map((t, i) => (
-        <button
-          type="button"
-          role="tab"
-          id={`pestana-${t.id}`}
-          aria-controls={`panel-${t.id}`}
-          aria-selected={i === 0 ? 'true' : 'false'}
-          tabindex={i === 0 ? 0 : -1}
-          data-tipo={t.id}
-        >
+        <button type="button" role="tab" id={`pestana-${t.id}`} aria-controls={`panel-${t.id}`}
+          aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-tipo={t.id}>
           {t.nombre}
         </button>
       ))}
     </div>
 
     <div class="muestra-cuerpo">
-      <div class="muestra-pantalla" data-muestra={datos}>
-        <div class="mp-marco">
-          <canvas width="512" height="256" role="img" aria-label="Pantalla de la TV mostrando un ejemplo"></canvas>
+      <div class="muestra-pantalla">
+        <div class="tarjeta-tv">
+          <div class="oled-app">
+            <canvas id="pantallaMuestra" width="128" height="64" role="img" aria-label="Pantalla de la TV con el ejemplo elegido"></canvas>
+          </div>
+          <p class="pie-pantalla mono">Así se ve en la TV</p>
         </div>
-        <button class="mp-sonido boton-sonido-mini" type="button" aria-pressed="false" hidden>
-          <span aria-hidden="true" class="mp-icono">▶</span>
-          <span class="mp-texto" data-tocar="Escúchala con su letra" data-detener="Detener">Escúchala con su letra</span>
-        </button>
       </div>
 
-      {m.tipos.map((t, i) => (
-        <div class="muestra-panel" role="tabpanel" id={`panel-${t.id}`} aria-labelledby={`pestana-${t.id}`} hidden={i !== 0}>
-          <h3>{t.titulo}</h3>
-          <p>{t.texto}</p>
-          {t.puntos.length > 0 && (
-            <ul>
-              {t.puntos.map((pt) => <li>{pt}</li>)}
-            </ul>
-          )}
-        </div>
-      ))}
+      <div class="muestra-paneles">
+        {m.tipos.map((t, i) => (
+          <div class="muestra-panel" role="tabpanel" id={`panel-${t.id}`} aria-labelledby={`pestana-${t.id}`} hidden={i !== 0} data-panel={t.id}>
+            <h3>{t.titulo}</h3>
+            <p class="panel-texto">{t.texto}</p>
+
+            {t.id === 'mensajes' && (
+              <div class="pruebalo" data-controles="mensajes">
+                <label class="campo">
+                  <span class="rotulo">Escribe tu mensaje</span>
+                  <textarea name="texto" rows="2" maxlength="200">{mensajeInicial}</textarea>
+                </label>
+                <div class="fila">
+                  <label class="campo">
+                    <span class="rotulo">Letra</span>
+                    <select name="fuente">
+                      {ESTILOS.map(([v, n]) => <option value={v}>{n}</option>)}
+                    </select>
+                  </label>
+                  <label class="campo">
+                    <span class="rotulo">Tamaño <output name="valorTamano">2</output></span>
+                    <input type="range" name="tamano" min="1" max="5" value="2" />
+                  </label>
+                </div>
+                <div class="segmentos" role="radiogroup" aria-label="Modo">
+                  <label><input type="radio" name="modo" value="ajustar" checked /><span>Ajustar</span></label>
+                  <label><input type="radio" name="modo" value="h" /><span>Scroll ↔</span></label>
+                  <label><input type="radio" name="modo" value="v" /><span>Scroll ↕</span></label>
+                </div>
+                <label class="interruptor"><input type="checkbox" name="invertido" /><span>Invertir</span></label>
+              </div>
+            )}
+
+            {t.id === 'canciones' && (
+              <div class="pruebalo" data-controles="canciones">
+                <button class="boton boton-principal boton-tocar" type="button" aria-pressed="false">
+                  <span class="bt-icono" aria-hidden="true"></span>
+                  <span class="bt-texto" data-tocar="Escúchala con su letra" data-detener="Detener">Escúchala con su letra</span>
+                </button>
+                <p class="nota">Ejemplo: "Cumpleaños feliz". La TV trae más de 50 canciones listas.</p>
+              </div>
+            )}
+
+            {(t.id === 'fotos' || t.id === 'gif') && (
+              <div class="pruebalo" data-controles={t.id}>
+                <label class="boton boton-secundario boton-archivo">
+                  <input type="file" accept={t.id === 'gif' ? 'image/gif' : 'image/*'} class="solo-lectores" />
+                  {t.id === 'gif' ? 'Prueba con tu GIF' : 'Prueba con tu foto'}
+                </label>
+                <label class="interruptor"><input type="checkbox" name="dithering" checked={t.id === 'fotos'} /><span>Pixelar</span></label>
+                <label class="campo">
+                  <span class="rotulo">Nivel de pixelado</span>
+                  <input type="range" name="umbral" min="0" max="255" value="127" />
+                </label>
+                <p class="nota" data-aviso>Se convierte aquí mismo, en tu celular: no se sube a ningún lado.</p>
+              </div>
+            )}
+
+            {t.id === 'dibujos' && (
+              <div class="pruebalo" data-controles="dibujos">
+                <div class="lienzo-marco">
+                  <canvas id="lienzoDibujo" width="128" height="64" aria-label="Lienzo para dibujar con el dedo"></canvas>
+                  <span class="lienzo-pista" aria-hidden="true">Dibuja aquí con el dedo</span>
+                </div>
+                <label class="campo">
+                  <span class="rotulo">Grosor <output name="valorGrosor">2</output></span>
+                  <input type="range" name="grosor" min="1" max="6" value="2" />
+                </label>
+                <div class="fila-botones">
+                  <button type="button" class="boton boton-secundario boton-chico" data-accion="deshacer">Deshacer</button>
+                  <button type="button" class="boton boton-secundario boton-chico" data-accion="limpiar">Limpiar</button>
+                </div>
+              </div>
+            )}
+
+            {t.puntos.length > 0 && (
+              <ul class="puntos">
+                {t.puntos.map((pt) => <li>{pt}</li>)}
+              </ul>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   </div>
 </section>
 
 <script>
-  import { PantallaPixel, Programacion } from '../scripts/tv/pantalla';
-  import { escenasDe, escenaCancionConLetra, FRASES_CUMPLE } from '../scripts/tv/demos';
-  import { buzzer, CUMPLEANOS } from '../scripts/tv/sonido';
+  import { PantallaApp } from '../scripts/oled/pantallaApp';
+  import { buzzer } from '../scripts/oled/buzzer';
+  import { fotoDemo, convertirFoto, gifDemo, cuadrosGif, listaCanciones, cargarCancion, leerArchivoVisitante, type Original } from '../scripts/oled/contenidos';
+  import { inicializarDibujo, establecerGrosor, deshacerTrazo, limpiarLienzo, obtenerResultadoImagen } from '../app-tvretro/dibujo.js';
 
-  const caja = document.querySelector<HTMLElement>('[data-muestra]');
-  const lienzo = caja?.querySelector('canvas');
-  if (caja && lienzo) {
-    const { color, mensajes } = JSON.parse(caja.dataset.muestra!) as { color: string; mensajes: string[] };
-    caja.style.setProperty('--color-pantalla', color);
+  const lienzo = document.getElementById('pantallaMuestra') as HTMLCanvasElement | null;
+  if (lienzo) {
+    const pantalla = new PantallaApp(lienzo);
     const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const pantalla = new PantallaPixel(lienzo, color);
-    const pestanas = [...document.querySelectorAll<HTMLButtonElement>('.pestanas [role="tab"]')];
-    let tipo = pestanas[0]?.dataset.tipo ?? 'mensajes';
-    const programa = new Programacion(pantalla, escenasDe(tipo, mensajes), sinMovimiento);
-    programa.dibujarYa();
+    const panel = (id: string) => document.querySelector<HTMLElement>(`[data-controles="${id}"]`);
+    const valor = (raiz: HTMLElement | null, nombre: string) => raiz?.querySelector<HTMLInputElement>(`[name="${nombre}"]`);
+    let tipo = '';
 
-    const sonido = caja.querySelector<HTMLButtonElement>('.mp-sonido')!;
-    const etiqueta = sonido.querySelector<HTMLElement>('.mp-texto')!;
-    let sonandoAqui = false;
-
-    let visible = false;
-    const actualizar = () => (visible && !document.hidden && (!sinMovimiento || sonandoAqui) ? programa.iniciar() : programa.detener());
-    new IntersectionObserver(([e]) => { visible = e.isIntersecting; actualizar(); }).observe(lienzo);
-    document.addEventListener('visibilitychange', actualizar);
-
-    const marcarSonido = (si: boolean) => {
-      sonandoAqui = si;
-      sonido.setAttribute('aria-pressed', String(si));
-      etiqueta.textContent = si ? etiqueta.dataset.detener! : etiqueta.dataset.tocar!;
+    /* ---------- Mensajes ---------- */
+    const pm = panel('mensajes');
+    const mostrarMensaje = () => {
+      if (!pm) return;
+      const modo = pm.querySelector<HTMLInputElement>('[name="modo"]:checked')?.value ?? 'ajustar';
+      const tamano = Number(valor(pm, 'tamano')?.value ?? 2);
+      const salida = pm.querySelector('output[name="valorTamano"]');
+      if (salida) salida.textContent = String(tamano);
+      pantalla.texto({
+        texto: pm.querySelector('textarea')?.value ?? '',
+        fuente: (pm.querySelector('select')?.value ?? 'sans') as never,
+        tamano,
+        modoTexto: modo === 'ajustar' ? 'ajustar' : 'scroll',
+        direccion: modo === 'v' ? 'v' : 'h',
+        invertido: !!valor(pm, 'invertido')?.checked,
+      }, !sinMovimiento);
     };
-    const alTerminar = () => { marcarSonido(false); programa.soltar(); actualizar(); };
+    pm?.addEventListener('input', () => tipo === 'mensajes' && mostrarMensaje());
+    pm?.addEventListener('change', () => tipo === 'mensajes' && mostrarMensaje());
 
-    sonido.addEventListener('click', () => {
-      if (sonandoAqui) { buzzer.detener(); return; }
-      buzzer.tocar(CUMPLEANOS, alTerminar);
-      programa.fijar(escenaCancionConLetra('Cumpleaños feliz', FRASES_CUMPLE, () => buzzer.estado()));
-      marcarSonido(true);
-      actualizar();
+    /* ---------- Fotos y GIF ---------- */
+    const opciones = (raiz: HTMLElement | null) => ({
+      umbral: Number(valor(raiz, 'umbral')?.value ?? 127),
+      dithering: !!valor(raiz, 'dithering')?.checked,
+    });
+    let fotoPropia: Original | null = null;
+    let gifPropio: unknown = null;
+    const pf = panel('fotos');
+    const pg = panel('gif');
+    const avisar = (raiz: HTMLElement | null, texto: string) => {
+      const a = raiz?.querySelector<HTMLElement>('[data-aviso]');
+      if (a) a.textContent = texto;
+    };
+    const mostrarFoto = async () => {
+      const original = fotoPropia ?? (await fotoDemo());
+      if (tipo === 'fotos') pantalla.imagen(convertirFoto(original, opciones(pf)));
+    };
+    const mostrarGif = async () => {
+      const leido = gifPropio ?? (await gifDemo());
+      if (tipo === 'gif') pantalla.animacion(cuadrosGif(leido, opciones(pg)));
+    };
+    pf?.addEventListener('input', () => void mostrarFoto());
+    pg?.addEventListener('input', () => void mostrarGif());
+    for (const [raiz, esGifPanel] of [[pf, false], [pg, true]] as const) {
+      raiz?.querySelector<HTMLInputElement>('input[type="file"]')?.addEventListener('change', async (e) => {
+        const entrada = e.target as HTMLInputElement;
+        const archivo = entrada.files?.[0];
+        entrada.value = '';
+        if (!archivo) return;
+        avisar(raiz, 'Convirtiendo…');
+        try {
+          const r = await leerArchivoVisitante(archivo);
+          if (r.tipo === 'gif' && (r.leido as { grises: unknown[] }).grises.length > 1) {
+            gifPropio = r.leido;
+            if (!esGifPanel) elegir(pestanas.find((b) => b.dataset.tipo === 'gif')!);
+            else void mostrarGif();
+          } else if (r.tipo === 'foto') {
+            fotoPropia = r.original;
+            if (esGifPanel) elegir(pestanas.find((b) => b.dataset.tipo === 'fotos')!);
+            else void mostrarFoto();
+          } else {
+            avisar(raiz, 'Ese GIF tiene un solo cuadro: pruébalo como foto.');
+            return;
+          }
+          avisar(raiz, 'Listo: así se vería en tu TV. No se subió a ningún lado.');
+        } catch (err) {
+          console.warn('[TV RETRO]', err);
+          avisar(raiz, (err as Error)?.message || 'No se pudo abrir ese archivo. Prueba con otro.');
+        }
+      });
+    }
+
+    /* ---------- Dibujos (dibujo.js de la app) ---------- */
+    const pd = panel('dibujos');
+    const lienzoDibujo = document.getElementById('lienzoDibujo') as HTMLCanvasElement | null;
+    let dibujoListo = false;
+    let pendiente = false;
+    const reflejarDibujo = () => {
+      if (pendiente || !lienzoDibujo) return;
+      pendiente = true;
+      requestAnimationFrame(() => {
+        pendiente = false;
+        if (tipo !== 'dibujos') return;
+        pantalla.imagen(obtenerResultadoImagen(lienzoDibujo, false).imagenData);
+      });
+    };
+    const prepararDibujo = () => {
+      if (dibujoListo || !lienzoDibujo) return;
+      dibujoListo = true;
+      inicializarDibujo(lienzoDibujo, () => { pd?.classList.add('con-trazo'); reflejarDibujo(); });
+    };
+    pd?.addEventListener('input', () => {
+      const g = Number(valor(pd, 'grosor')?.value ?? 2);
+      establecerGrosor(g);
+      const s = pd.querySelector('output[name="valorGrosor"]');
+      if (s) s.textContent = String(g);
+    });
+    pd?.addEventListener('click', (e) => {
+      const accion = (e.target as HTMLElement).closest<HTMLElement>('[data-accion]')?.dataset.accion;
+      if (!accion || !lienzoDibujo) return;
+      if (accion === 'deshacer') deshacerTrazo();
+      if (accion === 'limpiar') { limpiarLienzo(lienzoDibujo); pd.classList.remove('con-trazo'); }
+      reflejarDibujo();
     });
 
-    const elegir = (b: HTMLButtonElement, enfocar = false) => {
+    /* ---------- Canciones (grabación m1, como la app) ---------- */
+    const pc = panel('canciones');
+    const botonTocar = pc?.querySelector<HTMLButtonElement>('.boton-tocar');
+    const etiquetaTocar = botonTocar?.querySelector<HTMLElement>('.bt-texto');
+    let sonandoAqui = false;
+    const marcarTocar = (si: boolean) => {
+      sonandoAqui = si;
+      botonTocar?.setAttribute('aria-pressed', String(si));
+      if (etiquetaTocar) etiquetaTocar.textContent = si ? etiquetaTocar.dataset.detener! : etiquetaTocar.dataset.tocar!;
+    };
+    const mostrarCancion = async () => {
+      const [primera] = await listaCanciones();
+      const grab = await cargarCancion(primera.clave);
+      if (tipo === 'canciones' && !sonandoAqui) pantalla.musical(grab, undefined);
+    };
+    botonTocar?.addEventListener('click', async () => {
+      if (sonandoAqui) { buzzer.detener(); return; }
+      marcarTocar(true);
+      try {
+        const [primera] = await listaCanciones();
+        const grab = await cargarCancion(primera.clave);
+        if (!sonandoAqui) return;
+        buzzer.tocar(grab.notas, grab.duracion, () => { marcarTocar(false); if (tipo === 'canciones') void mostrarCancion(); });
+        pantalla.musical(grab, () => buzzer.tiempo());
+      } catch (e) {
+        console.warn('[TV RETRO]', e);
+        marcarTocar(false);
+      }
+    });
+
+    /* ---------- Reloj ---------- */
+    let relojId = 0;
+    const mostrarReloj = () => {
+      const pinta = () => {
+        if (tipo !== 'reloj') return;
+        const d = new Date();
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        pantalla.texto({ texto: `${hh}:${mm}`, fuente: 'clasica', tamano: 4 }, false);
+        relojId = window.setTimeout(pinta, 1000);
+      };
+      pinta();
+    };
+
+    /* ---------- Pestañas ---------- */
+    const pestanas = [...document.querySelectorAll<HTMLButtonElement>('.pestanas [role="tab"]')];
+    const mostrar = (t: string) => {
+      clearTimeout(relojId);
       if (sonandoAqui) buzzer.detener();
+      pantalla.detener();
+      tipo = t;
+      const acciones: Record<string, () => unknown> = {
+        mensajes: mostrarMensaje,
+        fotos: mostrarFoto,
+        gif: mostrarGif,
+        canciones: mostrarCancion,
+        reloj: mostrarReloj,
+        dibujos: () => { prepararDibujo(); reflejarDibujo(); },
+      };
+      Promise.resolve(acciones[t]?.()).catch((e) => console.warn('[TV RETRO]', e));
+    };
+    function elegir(b: HTMLButtonElement, enfocar = false) {
       for (const otra of pestanas) {
         const activa = otra === b;
         otra.setAttribute('aria-selected', String(activa));
@@ -104,11 +318,8 @@ const datos = JSON.stringify({ color: sitio.pantalla.color, mensajes: sitio.pant
       }
       if (enfocar) b.focus();
       b.scrollIntoView({ block: 'nearest', inline: 'center', behavior: sinMovimiento ? 'auto' : 'smooth' });
-      tipo = b.dataset.tipo!;
-      sonido.hidden = tipo !== 'canciones';
-      programa.cambiar(escenasDe(tipo, mensajes));
-    };
-
+      mostrar(b.dataset.tipo!);
+    }
     pestanas.forEach((b, i) => {
       b.addEventListener('click', () => elegir(b));
       b.addEventListener('keydown', (e) => {
@@ -118,7 +329,11 @@ const datos = JSON.stringify({ color: sitio.pantalla.color, mensajes: sitio.pant
         else if (paso) { e.preventDefault(); elegir(pestanas[(i + paso + pestanas.length) % pestanas.length], true); }
       });
     });
-    sonido.hidden = tipo !== 'canciones';
+
+    // Arranca cuando la sección se acerca a la vista (así no carga nada antes de tiempo).
+    new IntersectionObserver((entradas, obs) => {
+      if (entradas.some((e) => e.isIntersecting)) { obs.disconnect(); mostrar(pestanas.find((b) => b.getAttribute('aria-selected') === 'true')?.dataset.tipo ?? 'mensajes'); }
+    }, { rootMargin: '300px' }).observe(lienzo);
   }
 </script>
 
@@ -157,75 +372,86 @@ const datos = JSON.stringify({ color: sitio.pantalla.color, mensajes: sitio.pant
     border-color: var(--acento-relleno);
     box-shadow: 0 0 18px rgb(77 210 255 / .3);
   }
-  @media (min-width: 900px) {
-    .pestanas { margin-inline: 0; padding-inline: 0; flex-wrap: wrap; }
-  }
+  @media (min-width: 900px) { .pestanas { margin-inline: 0; padding-inline: 0; flex-wrap: wrap; } }
 
-  .muestra-cuerpo {
-    display: grid;
-    gap: 24px;
-    margin-top: 18px;
-    align-items: center;
-  }
+  .muestra-cuerpo { display: grid; gap: 20px; margin-top: 18px; align-items: start; }
   @media (min-width: 900px) {
     .muestra-cuerpo { grid-template-columns: 1.1fr 1fr; gap: 48px; margin-top: 28px; }
+    .muestra-pantalla { position: sticky; top: 88px; }
   }
 
-  .muestra-pantalla { --color-pantalla: #4DD2FF; display: grid; gap: 14px; justify-items: center; }
-  .mp-marco {
-    width: 100%;
-    padding: 12px;
-    border-radius: 18px;
-    background: #05080B;
-    border: 1px solid var(--borde-fuerte);
-    box-shadow: 0 0 60px -18px rgb(77 210 255 / .35), 0 2px 10px rgb(0 0 0 / .8) inset;
+  /* Tarjeta como la del dispositivo en la app. */
+  .tarjeta-tv {
+    padding: 12px 12px 8px;
+    border-radius: var(--radio-lg);
+    border: 1px solid var(--borde);
+    background: linear-gradient(155deg, var(--superficie-alta), var(--superficie) 55%);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 12px 32px -16px rgba(0, 0, 0, .7), 0 0 60px -24px rgb(77 210 255 / .35);
   }
-  .mp-marco canvas {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 2 / 1;
-    border-radius: 6px;
-    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--color-pantalla) 55%, transparent));
-  }
-
-  .boton-sonido-mini {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 44px;
-    padding: 6px 18px 6px 6px;
-    border-radius: var(--radio-pill);
-    border: 1px solid var(--borde-fuerte);
-    background: var(--superficie);
-    color: var(--texto);
-    font: inherit;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .boton-sonido-mini[hidden] { display: none; }
-  .boton-sonido-mini:hover, .boton-sonido-mini[aria-pressed="true"] { border-color: var(--acento); box-shadow: var(--brillo-cian); }
-  .mp-icono {
-    display: grid;
-    place-items: center;
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    background: var(--acento-relleno);
-    color: var(--sobre-acento);
-    font-size: 13px;
-  }
-  .boton-sonido-mini[aria-pressed="true"] .mp-icono { font-size: 0; }
-  .boton-sonido-mini[aria-pressed="true"] .mp-icono::before { content: ""; width: 10px; height: 10px; background: currentColor; border-radius: 2px; }
+  .pie-pantalla { margin-top: 8px; text-align: center; color: var(--texto-2); font-size: 12px; letter-spacing: .03em; }
 
   .muestra-panel h3 { font-size: clamp(24px, 3.4vw, 32px); }
-  .muestra-panel p { margin-top: 12px; color: var(--texto-2); font-size: 17px; max-width: 42ch; }
-  .muestra-panel ul { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 10px; }
-  .muestra-panel li { display: flex; gap: 12px; align-items: baseline; font-weight: 600; }
-  .muestra-panel li::before {
-    content: "";
-    flex: none;
-    width: 8px; height: 8px;
-    background: var(--acento);
-    box-shadow: 0 0 8px var(--acento);
-    transform: translateY(-2px);
+  .panel-texto { margin-top: 10px; color: var(--texto-2); font-size: 17px; max-width: 44ch; }
+
+  .pruebalo {
+    display: grid;
+    gap: 14px;
+    margin-top: 18px;
+    padding: 16px;
+    border-radius: var(--radio-md);
+    border: 1px solid var(--borde);
+    background: rgb(18 24 33 / .7);
   }
+  .fila { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .campo { display: grid; gap: 6px; }
+  .rotulo { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--texto-2); }
+  .rotulo output { color: var(--acento); font-family: var(--fuente-pantalla), monospace; }
+  textarea, select {
+    width: 100%;
+    font: inherit;
+    font-size: 16px;
+    color: var(--texto);
+    background: #0E141C;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-sm);
+    padding: 10px 12px;
+  }
+  textarea { resize: vertical; min-height: 64px; }
+  select { min-height: 44px; }
+  textarea:focus, select:focus { border-color: var(--acento); outline: none; box-shadow: 0 0 0 3px rgb(77 210 255 / .2); }
+  input[type="range"] { width: 100%; accent-color: var(--acento-relleno); min-height: 32px; }
+
+  .segmentos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: var(--radio-sm); background: #0E141C; border: 1px solid var(--borde); }
+  .segmentos label { position: relative; }
+  .segmentos input { position: absolute; opacity: 0; inset: 0; }
+  .segmentos span { display: grid; place-items: center; min-height: 40px; border-radius: 6px; font-weight: 600; font-size: 15px; color: var(--texto-2); cursor: pointer; }
+  .segmentos input:checked + span { background: var(--acento-relleno); color: var(--sobre-acento); }
+  .segmentos input:focus-visible + span { outline: 3px solid var(--acento); outline-offset: 2px; }
+
+  .interruptor { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; font-weight: 600; cursor: pointer; justify-self: start; }
+  .interruptor input { appearance: none; width: 46px; height: 28px; border-radius: 999px; background: #253041; position: relative; cursor: pointer; transition: background .15s ease; margin: 0; }
+  .interruptor input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--texto); transition: transform .15s ease; }
+  .interruptor input:checked { background: var(--acento-relleno); }
+  .interruptor input:checked::after { transform: translateX(18px); background: var(--sobre-acento); }
+  .interruptor input:focus-visible { outline: 3px solid var(--acento); outline-offset: 3px; }
+
+  .boton-archivo { justify-self: start; cursor: pointer; }
+  .boton-archivo:focus-within { outline: 3px solid var(--acento); outline-offset: 3px; }
+  .boton-chico { min-height: 44px; padding: 8px 18px; font-size: 15px; }
+  .fila-botones { display: flex; gap: 10px; flex-wrap: wrap; }
+  .nota { color: var(--texto-2); font-size: 14px; }
+
+  .boton-tocar { justify-self: start; }
+  .bt-icono { width: 0; height: 0; border-left: 14px solid currentColor; border-top: 9px solid transparent; border-bottom: 9px solid transparent; }
+  .boton-tocar[aria-pressed="true"] .bt-icono { width: 14px; height: 14px; border: 0; background: currentColor; border-radius: 2px; }
+
+  /* Lienzo de dibujo: el de la app (128×64), agrandado sin suavizar. */
+  .lienzo-marco { position: relative; border-radius: var(--radio-sm); overflow: hidden; border: 1px solid var(--borde-fuerte); }
+  .lienzo-marco canvas { display: block; width: 100%; height: auto; aspect-ratio: 2 / 1; image-rendering: pixelated; touch-action: none; cursor: crosshair; }
+  .lienzo-pista { position: absolute; inset: 0; display: grid; place-items: center; color: var(--texto-2); font-size: 14px; pointer-events: none; }
+  .con-trazo .lienzo-pista { display: none; }
+
+  .puntos { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 8px; }
+  .puntos li { display: flex; gap: 12px; align-items: baseline; font-weight: 600; }
+  .puntos li::before { content: ""; flex: none; width: 8px; height: 8px; background: var(--acento); box-shadow: 0 0 8px var(--acento); transform: translateY(-2px); }
 </style>

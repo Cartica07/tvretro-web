@@ -34,8 +34,7 @@ const esquema = z.object({
   }),
   tiktok: z.object({ seguidores: opcional }),
   pantalla: z.object({
-    color: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Debe ser un color como "#4DD2FF"'),
-    mensajes: z.array(z.string().max(24, 'Máximo 24 letras por mensaje')).min(1),
+    mensajes: z.array(z.string().max(60, 'Máximo 60 letras por mensaje')).min(1),
   }),
   portada: z.object({
     etiqueta: texto,

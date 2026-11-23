@@ -1,0 +1,298 @@
+/**dibujo
+ * Módulo de Dibujo Libre (paint sencillo para la OLED)
+ *
+ * V1.12: cuarto tipo de contenido, "Dibujo" -- un lienzo de 128×64
+ * (resolución NATIVA de la OLED, sin reescalar internamente) donde se
+ * dibuja con mouse/dedo/lápiz. Grosor de línea ajustable y deshacer
+ * multi-nivel, un paso por trazo.
+ *
+ * POR QUÉ ESTO NO TOCA EL FIRMWARE NI EL ESQUEMA DE FIREBASE: lo
+ * dibujado, al enviar o guardar, se convierte al MISMO formato de
+ * bitmap monocromático 1bpp que ya usa el tipo "imagen" (ver
+ * imageProcessor.js) -- reutilizando el mismo pipeline (escala de
+ * grises -> umbral -> Base64) que ya procesa fotos subidas. Para el
+ * dispositivo y para Firebase, un dibujo enviado es indistinguible de
+ * una imagen subida: mismo tipo:"imagen", mismos campos. La TV no se
+ * entera de que existe un modo "Dibujo" -- no hace falta flashear nada
+ * nuevo para esta función.
+ */
+
+import { convertirAEscalaGrises, convertirAMonocromatico, codificarBase64 } from './imageProcessor.js';
+
+// Colores del lienzo: mismo criterio que el resto del panel (fondo
+// oscuro, trazo en el color de acento). Así lo que ves mientras
+// dibujás ya es fiel a cómo se va a ver en la OLED real -- trazo =
+// píxel encendido, fondo = apagado -- sin tener que invertir nada
+// mentalmente mientras dibujás.
+const COLOR_FONDO = '#060503';
+const COLOR_TRAZO = '#4dd2ff';
+
+let ctx = null;
+let lienzoRef = null;
+let grosorActual = 2;
+let dibujando = false;
+let ultimoX = 0;
+let ultimoY = 0;
+let notificarCambio = null;
+
+// Pila de deshacer: una snapshot (ImageData) por cada trazo YA
+// terminado, tomada ANTES de empezar el trazo siguiente. "Deshacer" =
+// sacar la última snapshot guardada y restaurarla tal cual estaba.
+// Tope de tamaño para no crecer sin límite en una sesión larga.
+const TOPE_HISTORIAL = 60;
+let historial = [];
+
+// Pila de rehacer: lo inverso de deshacer -- cada vez que se deshace
+// un trazo, el estado que había ANTES de deshacer se guarda acá, para
+// poder volver a él con "Rehacer". Se vacía apenas se dibuja algo
+// nuevo (mismo criterio que cualquier editor: no tiene sentido
+// "rehacer" algo viejo después de haber trazado algo distinto encima).
+let rehistorial = [];
+
+function coordenadasDesdeEvento(canvas, evento) {
+  const rect = canvas.getBoundingClientRect();
+  const escalaX = canvas.width / rect.width;
+  const escalaY = canvas.height / rect.height;
+  return {
+    x: (evento.clientX - rect.left) * escalaX,
+    y: (evento.clientY - rect.top) * escalaY
+  };
+}
+
+// El trazo se pinta en píxeles ENTEROS, sin suavizado: el lienzo es la
+// OLED en tamaño real (128×64) y cada punto que se ve es un punto que se
+// prende. Con el suavizado del canvas, un trazo fino quedaba en píxeles
+// grises a medio pintar que al pasar a blanco y negro (umbral 127) se
+// perdían: con grosor 1, una diagonal llegaba a la OLED cortada.
+const mascarasPincel = new Map();
+
+// Puntos de un pincel redondo de "d" píxeles de diámetro (d = 1, 2: un
+// punto o un cuadrado de 2×2; desde 4, redondeado).
+function mascaraPincel(d) {
+  let m = mascarasPincel.get(d);
+  if (!m) {
+    m = [];
+    const c = (d - 1) / 2, r2 = (d / 2) * (d / 2);
+    for (let j = 0; j < d; j++) {
+      for (let i = 0; i < d; i++) {
+        if ((i - c) * (i - c) + (j - c) * (j - c) <= r2) m.push([i, j]);
+      }
+    }
+    mascarasPincel.set(d, m);
+  }
+  return m;
+}
+
+// Apoya el pincel con su centro en el píxel (x, y).
+// Goma (auditoría 2026-11-15, H-16): mientras está activa el trazo pinta con el color de fondo.
+let gomaActiva = false;
+
+/** Activa o desactiva la goma. */
+export function ponerGoma(activa) {
+  gomaActiva = !!activa;
+}
+
+function estampar(x, y) {
+  const d = Math.max(1, Math.round(grosorActual));
+  const o = Math.floor((d - 1) / 2);
+  ctx.fillStyle = gomaActiva ? COLOR_FONDO : COLOR_TRAZO;
+  for (const [i, j] of mascaraPincel(d)) ctx.fillRect(x - o + i, y - o + j, 1, 1);
+}
+
+// Línea de píxel a píxel (Bresenham), apoyando el pincel en cada punto.
+function trazarLinea(x0, y0, x1, y1) {
+  const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0);
+  const sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+  let err = dx + dy;
+  for (;;) {
+    estampar(x0, y0);
+    if (x0 === x1 && y0 === y1) break;
+    const e2 = 2 * err;
+    if (e2 >= dy) { err += dy; x0 += sx; }
+    if (e2 <= dx) { err += dx; y0 += sy; }
+  }
+}
+
+// Píxel del lienzo bajo el puntero.
+function pixelDesdeEvento(canvas, evento) {
+  const p = coordenadasDesdeEvento(canvas, evento);
+  return { x: Math.floor(p.x), y: Math.floor(p.y) };
+}
+
+function guardarSnapshot(canvas) {
+  historial.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+  if (historial.length > TOPE_HISTORIAL) historial.shift();
+  rehistorial = [];
+}
+
+function pintarFondo(canvas) {
+  ctx.fillStyle = COLOR_FONDO;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+/**
+ * Inicializa el lienzo: fondo + listeners de puntero (mouse, touch y
+ * lápiz unificados vía Pointer Events). Llamar una sola vez al
+ * arrancar la app, sobre el <canvas id="lienzoDibujo">.
+ *
+ * @param {HTMLCanvasElement} canvas
+ * @param {() => void} [onCambio] - V1.13: se llama cada vez que el
+ *   trazo cambia algo visible (punto nuevo, segmento nuevo), para que
+ *   el llamador pueda reflejarlo en vivo en la pantalla virtual
+ *   principal, igual que ya pasa con Texto/Imagen. No se llama en
+ *   deshacer/limpiar -- esos se disparan desde botones aparte, fuera
+ *   de este módulo, así que el llamador los refleja por su cuenta.
+ */
+export function inicializarDibujo(canvas, onCambio = null) {
+  ctx = canvas.getContext('2d', { willReadFrequently: true });
+  lienzoRef = canvas;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = COLOR_TRAZO;
+  ctx.lineWidth = grosorActual;
+  notificarCambio = onCambio;
+
+  pintarFondo(canvas);
+
+  // Evita que el navegador interprete el arrastre como scroll/zoom en
+  // touch -- si no, dibujar con el dedo en el celular movería la
+  // página en vez de trazar.
+  canvas.style.touchAction = 'none';
+
+  canvas.addEventListener('pointerdown', (e) => {
+    // Solo el botón principal (dedo, lápiz o clic izquierdo) dibuja.
+    if (e.button !== 0) return;
+    dibujando = true;
+    guardarSnapshot(canvas);
+
+    const p = pixelDesdeEvento(canvas, e);
+    ultimoX = p.x;
+    ultimoY = p.y;
+
+    // Punto simple (tap sin arrastre) igual deja una marca.
+    estampar(p.x, p.y);
+
+    if (notificarCambio) notificarCambio();
+
+    canvas.setPointerCapture(e.pointerId);
+  });
+
+  canvas.addEventListener('pointermove', (e) => {
+    if (!dibujando) return;
+    const p = pixelDesdeEvento(canvas, e);
+    if (p.x === ultimoX && p.y === ultimoY) return;
+
+    trazarLinea(ultimoX, ultimoY, p.x, p.y);
+
+    if (notificarCambio) notificarCambio();
+
+    ultimoX = p.x;
+    ultimoY = p.y;
+  });
+
+  function terminarTrazo() {
+    dibujando = false;
+  }
+
+  canvas.addEventListener('pointerup', terminarTrazo);
+  canvas.addEventListener('pointercancel', terminarTrazo);
+  canvas.addEventListener('pointerleave', () => {
+    if (dibujando) terminarTrazo();
+  });
+}
+
+/** Cambia el grosor de línea (en píxeles de la OLED, no de pantalla). */
+export function establecerGrosor(px) {
+  grosorActual = px;
+  if (ctx) ctx.lineWidth = px;
+}
+
+/** Deshace el último trazo completo. Devuelve false si no hay nada que deshacer. */
+export function deshacerTrazo() {
+  if (historial.length === 0) return false;
+
+  // Antes de restaurar el paso anterior, guardamos cómo está AHORA en
+  // la pila de rehacer, para poder volver a este estado con "Rehacer".
+  rehistorial.push(ctx.getImageData(0, 0, lienzoRef.width, lienzoRef.height));
+  if (rehistorial.length > TOPE_HISTORIAL) rehistorial.shift();
+
+  const snapshot = historial.pop();
+  ctx.putImageData(snapshot, 0, 0);
+  return true;
+}
+
+/** Rehace el último trazo deshecho. Devuelve false si no hay nada que rehacer. */
+export function rehacerTrazo() {
+  if (rehistorial.length === 0) return false;
+
+  historial.push(ctx.getImageData(0, 0, lienzoRef.width, lienzoRef.height));
+  if (historial.length > TOPE_HISTORIAL) historial.shift();
+
+  const snapshot = rehistorial.pop();
+  ctx.putImageData(snapshot, 0, 0);
+  return true;
+}
+
+/** Borra todo el lienzo (el borrado en sí también se puede deshacer). */
+export function limpiarLienzo(canvas) {
+  guardarSnapshot(canvas);
+  pintarFondo(canvas);
+}
+
+/**
+ * Descarta el trazo que se está dibujando en este momento (si hay uno):
+ * vuelve el lienzo a como estaba antes de empezarlo. Se usa cuando el
+ * usuario apoya un segundo dedo para hacer zoom: el primer dedo ya había
+ * empezado un trazo que no tiene que quedar. Devuelve true si descartó algo.
+ */
+export function cancelarTrazoActual() {
+  if (!dibujando) return false;
+  dibujando = false;
+  const snapshot = historial.pop();
+  if (snapshot) ctx.putImageData(snapshot, 0, 0);
+  if (notificarCambio) notificarCambio();
+  return true;
+}
+
+/** true si hay al menos un trazo para deshacer. */
+export function hayHistorial() {
+  return historial.length > 0;
+}
+
+/** true si hay al menos un trazo para rehacer. */
+export function hayRehistorial() {
+  return rehistorial.length > 0;
+}
+
+/**
+ * Convierte el lienzo actual al mismo formato {imagenData, imagenAncho,
+ * imagenAlto, preprocesada} que produce procesarImagen() en
+ * imageProcessor.js -- así enviarEstado() y guardarImagenCatalogo() lo
+ * reciben sin saber (ni les importa) que vino de un dibujo y no de un
+ * archivo subido.
+ *
+ * conPng: la copia PNG ("preprocesada") solo hace falta para guardar el
+ * dibujo en la galería. Generarla cuesta unos 3 ms (mucho más en un
+ * celular), así que la vista previa mientras se dibuja y el envío la
+ * piden con conPng = false.
+ */
+export function obtenerResultadoImagen(canvas, conPng = true) {
+  const preprocesada = conPng ? canvas.toDataURL('image/png') : null;
+
+  // Se trabaja sobre una COPIA: convertirAEscalaGrises muta los
+  // píxeles del canvas que recibe. Si operáramos sobre el lienzo
+  // visible, el usuario vería el dibujo "apagarse" a gris cada vez
+  // que envía o guarda, y encima perdería los colores para seguir
+  // dibujando después.
+  const copia = document.createElement('canvas');
+  copia.width = canvas.width;
+  copia.height = canvas.height;
+  // willReadFrequently: enseguida se leen sus píxeles (grises y monocromático); sin esto el navegador avisa de lecturas lentas.
+  copia.getContext('2d', { willReadFrequently: true }).drawImage(canvas, 0, 0);
+
+  const gris = convertirAEscalaGrises(copia);
+  const { bitmap, width, height } = convertirAMonocromatico(gris, 127);
+  const imagenData = codificarBase64(bitmap);
+
+  return { imagenData, imagenAncho: width, imagenAlto: height, preprocesada };
+}

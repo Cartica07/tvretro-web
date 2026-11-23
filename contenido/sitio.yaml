@@ -41,11 +41,10 @@ tiktok:
   # Escríbelo como quieres que se lea. Déjalo vacío ("") para ocultar la frase.
   seguidores: "20 mil"
 
-# La pantallita animada de la portada.
+# La pantallita de la portada (se dibuja con el mismo código de la app,
+# letra Sans tamaño 2, como sale por defecto). El tercer mensaje pasa
+# deslizándose (Scroll). Caben letras, números, tildes, ñ, ¿ y ¡.
 pantalla:
-  # Color de los puntos, igual al de la TV real.
-  color: "#4DD2FF"
-  # Mensajes que la TV "escribe" sola (cortos: máximo 24 letras cada uno).
   mensajes:
     - "¡Hola, Ana!"
     - "Te quiero mucho"

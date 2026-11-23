@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "description": "Página de ventas de TV RETRO",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
+    "dev": "node scripts/grabar-canciones.mjs && astro dev",
+    "build": "node scripts/grabar-canciones.mjs && astro build",
     "preview": "astro preview",
+    "canciones": "node scripts/grabar-canciones.mjs",
     "pendientes": "node scripts/pendientes.mjs"
   },
   "dependencies": {

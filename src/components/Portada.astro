@@ -9,7 +9,7 @@ const partesTitulo = p.titulo.split(/(\*[^*]+\*)/).filter(Boolean).map((t) =>
 );
 const tiktok = enlaceRed('tiktok');
 const seguidores = sitio.tiktok.seguidores.trim();
-const datosPantalla = JSON.stringify({ color: sitio.pantalla.color, mensajes: sitio.pantalla.mensajes });
+const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
 ---
 <section class="portada" id="inicio" aria-labelledby="portada-titulo">
   <div class="contenedor portada-grid">
@@ -25,15 +25,13 @@ const datosPantalla = JSON.stringify({ color: sitio.pantalla.color, mensajes: si
       <figure class="tv" data-pantalla={datosPantalla}>
         <div class="tv-antenas" aria-hidden="true"><span></span><span></span></div>
         <div class="tv-cuerpo">
-          <div class="tv-marco">
+          <div class="tv-marco oled-app">
             <canvas
-              class="tv-pantalla"
-              width="512"
-              height="256"
+              width="128"
+              height="64"
               role="img"
-              aria-label="Pantalla de la TV RETRO escribiendo mensajes, dibujando un corazón, sonando una canción y mostrando la hora"
+              aria-label="Pantalla de la TV RETRO mostrando mensajes, una foto, un GIF y una canción con letra"
             ></canvas>
-            <span class="tv-reflejo" aria-hidden="true"></span>
           </div>
           <div class="tv-lado" aria-hidden="true">
             <span class="tv-perilla"></span>
@@ -83,45 +81,77 @@ const datosPantalla = JSON.stringify({ color: sitio.pantalla.color, mensajes: si
 </section>
 
 <script>
-  import { PantallaPixel, Programacion, escenaEscribir, escenaDibujo, escenaMusica, escenaReloj } from '../scripts/tv/pantalla';
-  import { buzzer, CUMPLEANOS } from '../scripts/tv/sonido';
+  import { PantallaApp } from '../scripts/oled/pantallaApp';
+  import { buzzer } from '../scripts/oled/buzzer';
+  import { fotoDemo, convertirFoto, gifDemo, cuadrosGif, listaCanciones, cargarCancion } from '../scripts/oled/contenidos';
 
   const figura = document.querySelector<HTMLElement>('.tv[data-pantalla]');
-  const lienzo = figura?.querySelector<HTMLCanvasElement>('canvas');
+  const lienzo = figura?.querySelector('canvas');
   if (figura && lienzo) {
-    const { color, mensajes } = JSON.parse(figura.dataset.pantalla!) as { color: string; mensajes: string[] };
-    figura.style.setProperty('--color-pantalla', color);
-
+    const { mensajes } = JSON.parse(figura.dataset.pantalla!) as { mensajes: string[] };
     const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const pantalla = new PantallaPixel(lienzo, color);
+    const pantalla = new PantallaApp(lienzo);
 
-    // Mensajes intercalados con dibujo, canción y reloj.
-    const extras = [escenaDibujo(), escenaMusica('Tu canción'), escenaReloj()];
-    const escenas = mensajes.flatMap((m, i) => [escenaEscribir(m), ...(i < extras.length ? [extras[i]] : [])]);
-    const programa = new Programacion(pantalla, escenas, sinMovimiento);
-    programa.dibujarYa();
+    // Lo que va mostrando sola: todo con el código de la app.
+    type Paso = { dura: number; mostrar: () => Promise<void> | void };
+    const pasos: Paso[] = [];
+    const msj = (i: number) => mensajes[i % mensajes.length];
+    pasos.push({ dura: 3200, mostrar: () => pantalla.texto({ texto: msj(0) }) });
+    pasos.push({ dura: 3600, mostrar: async () => pantalla.imagen(convertirFoto(await fotoDemo(), { umbral: 127, dithering: true })) });
+    pasos.push({ dura: 3200, mostrar: () => pantalla.texto({ texto: msj(1) }) });
+    pasos.push({ dura: 3600, mostrar: async () => pantalla.animacion(cuadrosGif(await gifDemo(), { umbral: 127, dithering: false })) });
+    pasos.push({ dura: 6500, mostrar: () => pantalla.texto({ texto: msj(2), tamano: 3, modoTexto: 'scroll' }, !sinMovimiento) });
+    pasos.push({ dura: 3200, mostrar: () => pantalla.texto({ texto: msj(3) }) });
 
-    // Solo se anima cuando se ve (ahorra batería en el celular).
+    let indice = 0;
+    let temporizador = 0;
+    let corriendo = false;
+    let ocupada = false; // sonando la canción
+    const siguiente = async () => {
+      if (!corriendo || ocupada) return;
+      const paso = pasos[indice];
+      indice = (indice + 1) % pasos.length;
+      try { await paso.mostrar(); } catch (e) { console.warn('[TV RETRO]', e); }
+      if (corriendo && !ocupada && !sinMovimiento) temporizador = window.setTimeout(siguiente, paso.dura);
+    };
+    const iniciar = () => { if (corriendo) return; corriendo = true; void siguiente(); };
+    const pausar = () => { corriendo = false; clearTimeout(temporizador); if (!ocupada) pantalla.detener(); };
+
     let visible = true;
-    const actualizar = () => (visible && !document.hidden && (!sinMovimiento || buzzer.sonando) ? programa.iniciar() : programa.detener());
+    const actualizar = () => (visible && !document.hidden ? iniciar() : pausar());
     new IntersectionObserver(([e]) => { visible = e.isIntersecting; actualizar(); }).observe(lienzo);
     document.addEventListener('visibilitychange', actualizar);
 
-    // Botón "Escucha cómo suena".
+    // "Escucha cómo suena": la canción de muestra, con letra y sonido, como en la app.
     const boton = document.querySelector<HTMLButtonElement>('.boton-sonido')!;
     const etiqueta = boton.querySelector<HTMLElement>('.bs-texto')!;
-    const marcar = (sonando: boolean) => {
-      boton.setAttribute('aria-pressed', String(sonando));
-      figura.classList.toggle('tv-sonando', sonando);
-      etiqueta.textContent = sonando ? etiqueta.dataset.detener! : etiqueta.dataset.tocar!;
+    const marcar = (si: boolean) => {
+      boton.setAttribute('aria-pressed', String(si));
+      figura.classList.toggle('tv-sonando', si);
+      etiqueta.textContent = si ? etiqueta.dataset.detener! : etiqueta.dataset.tocar!;
     };
-    const terminar = () => { marcar(false); programa.soltar(); actualizar(); };
-    boton.addEventListener('click', () => {
-      if (buzzer.sonando && boton.getAttribute('aria-pressed') === 'true') { buzzer.detener(); return; }
-      buzzer.tocar(CUMPLEANOS, terminar);
-      programa.fijar(escenaMusica('Cumpleaños feliz', () => buzzer.estado()));
+    const terminar = () => {
+      marcar(false);
+      ocupada = false;
+      pantalla.detener();
+      clearTimeout(temporizador);
+      if (corriendo) void siguiente();
+    };
+    boton.addEventListener('click', async () => {
+      if (ocupada) { buzzer.detener(); return; }
+      ocupada = true;
+      clearTimeout(temporizador);
       marcar(true);
-      actualizar();
+      try {
+        const [primera] = await listaCanciones();
+        const grab = await cargarCancion(primera.clave);
+        if (!ocupada) return;
+        buzzer.tocar(grab.notas, grab.duracion, terminar);
+        pantalla.musical(grab, () => buzzer.tiempo());
+      } catch (e) {
+        console.warn('[TV RETRO]', e);
+        terminar();
+      }
     });
   }
 </script>
@@ -247,28 +277,7 @@ const datosPantalla = JSON.stringify({ color: sitio.pantalla.color, mensajes: si
       0 30px 60px -30px rgb(0 0 0 / .9),
       0 0 80px -20px rgb(77 210 255 / .25);
   }
-  .tv-marco {
-    position: relative;
-    padding: 10px;
-    border-radius: 14px;
-    background: #05080B;
-    box-shadow: 0 0 0 2px #0d131b inset, 0 2px 8px rgb(0 0 0 / .8) inset;
-  }
-  .tv-pantalla {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 2 / 1;
-    border-radius: 4px;
-    image-rendering: pixelated;
-    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--color-pantalla) 55%, transparent));
-  }
-  .tv-reflejo {
-    position: absolute;
-    inset: 10px;
-    border-radius: 4px;
-    background: linear-gradient(155deg, rgb(255 255 255 / .07), transparent 38%);
-    pointer-events: none;
-  }
+  .tv-marco { border-radius: 14px; }
   .tv-lado {
     display: grid;
     align-content: space-between;
