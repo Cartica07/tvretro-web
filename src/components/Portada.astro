@@ -1,6 +1,7 @@
 ---
 import { sitio, enlaceRed, esPendiente } from '../lib/sitio';
 import BotonWhatsApp from './BotonWhatsApp.astro';
+import TvMadera from './TvMadera.astro';
 
 const p = sitio.portada;
 // "*palabra*" → palabra resaltada.
@@ -23,24 +24,8 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
 
     <div class="portada-tv">
       <figure class="tv" data-pantalla={datosPantalla}>
-        <div class="tv-antenas" aria-hidden="true"><span></span><span></span></div>
-        <div class="tv-cuerpo">
-          <div class="tv-marco oled-app">
-            <canvas
-              width="128"
-              height="64"
-              role="img"
-              aria-label="Pantalla de la TV RETRO mostrando mensajes, una foto, un GIF y una canción con letra"
-            ></canvas>
-          </div>
-          <div class="tv-lado" aria-hidden="true">
-            <span class="tv-perilla"></span>
-            <span class="tv-rejilla"></span>
-            <span class="tv-led"></span>
-          </div>
-        </div>
-        <div class="tv-patas" aria-hidden="true"><span></span><span></span></div>
-        <figcaption class="solo-lectores">Animación de lo que muestra la pantalla de la TV RETRO.</figcaption>
+        <TvMadera etiqueta="Pantalla de la TV RETRO mostrando mensajes, una foto, un GIF y una canción con letra" />
+        <figcaption class="solo-lectores">La TV RETRO de madera, con su pantalla mostrando lo que le envías desde el celular.</figcaption>
       </figure>
 
       <button class="boton-sonido" type="button" aria-pressed="false">
@@ -67,7 +52,7 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
         <p class="prueba-social">
           <span class="ps-numero mono">+{seguidores}</span>
           <span>
-            personas siguen sus canciones en TikTok.
+            personas siguen sus canciones en TikTok.{' '}
             {tiktok ? (
               <a href={tiktok} target="_blank" rel="noopener">Escúchalas aquí</a>
             ) : (
@@ -237,78 +222,9 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
   .portada-tv { display: grid; justify-items: center; gap: 14px; }
 
   .tv {
-    --color-pantalla: #4DD2FF;
     margin: 0;
-    width: min(100%, 460px);
-    display: grid;
-    justify-items: center;
+    width: min(100%, 440px);
   }
-  .tv-antenas { position: relative; width: 46%; height: 42px; }
-  .tv-antenas span {
-    position: absolute;
-    bottom: 0;
-    width: 3px;
-    height: 48px;
-    background: linear-gradient(var(--borde-fuerte), #1b2433);
-    border-radius: 2px;
-    transform-origin: bottom center;
-  }
-  .tv-antenas span:first-child { left: 34%; transform: rotate(-28deg); }
-  .tv-antenas span:last-child { right: 34%; transform: rotate(24deg); }
-  .tv-antenas span::before {
-    content: "";
-    position: absolute;
-    top: -5px; left: -3px;
-    width: 9px; height: 9px;
-    background: var(--borde-fuerte);
-  }
-
-  .tv-cuerpo {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 14px;
-    padding: 16px;
-    border-radius: 22px;
-    background: linear-gradient(160deg, #1c2533, #121821 60%);
-    border: 1px solid var(--borde-fuerte);
-    box-shadow:
-      0 1px 0 rgb(255 255 255 / .06) inset,
-      0 30px 60px -30px rgb(0 0 0 / .9),
-      0 0 80px -20px rgb(77 210 255 / .25);
-  }
-  .tv-marco { border-radius: 14px; }
-  .tv-lado {
-    display: grid;
-    align-content: space-between;
-    justify-items: center;
-    padding-block: 6px;
-    width: clamp(34px, 9vw, 46px);
-  }
-  .tv-perilla {
-    width: 100%;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: conic-gradient(from 20deg, #2b3647, #161e2a, #2b3647, #161e2a, #2b3647);
-    border: 2px solid #33415A;
-    box-shadow: 0 4px 8px rgb(0 0 0 / .5);
-  }
-  .tv-sonando .tv-perilla { animation: girar 2.4s linear infinite; }
-  @keyframes girar { to { transform: rotate(360deg); } }
-  .tv-rejilla {
-    width: 70%;
-    height: 34px;
-    background: repeating-linear-gradient(to bottom, #2b3647 0 3px, transparent 3px 6px);
-    border-radius: 2px;
-  }
-  .tv-led {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--ok);
-    box-shadow: 0 0 10px var(--ok);
-  }
-  .tv-patas { display: flex; justify-content: space-between; width: 70%; }
-  .tv-patas span { width: 18px; height: 12px; background: #1b2433; border-radius: 0 0 6px 6px; }
 
   /* ---------- Botón de sonido ---------- */
   .boton-sonido {

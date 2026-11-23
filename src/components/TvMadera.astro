@@ -1,0 +1,156 @@
+---
+/**
+ * La TV de madera vista de frente, dibujada con las MEDIDAS del modelo 3D
+ * (Mini_TV_de_madera_3D.html del dueño), en milímetros:
+ * caja 61 × 40, frente de madera blanca, hueco de pantalla 22 × 14,
+ * pieza de la perilla de 17 × 29,8 con rejilla de 5 ranuras, perilla Ø12,
+ * base de imanes y patas abiertas (57 mm de pie a pie).
+ *
+ * El canvas de la pantalla (128×64) va encima, en el área activa de la OLED
+ * (21,74 × 10,87 mm), y lo dibuja el mismo código de la app.
+ */
+interface Props { etiqueta: string }
+const { etiqueta } = Astro.props;
+
+// En el SVG, y crece hacia abajo: svgY = 42 − y del modelo.
+const Y = (y: number) => +(42 - y).toFixed(2);
+const f = (n: number) => +n.toFixed(2);
+
+// Frente y hueco de la pantalla (mismas constantes que el modelo).
+const FL = -27.4, FT = 36.9, PX = 16.9;
+const hueco = { x: FL + 7, y: Y(FT - 9.9), w: 22, h: 14 };
+const activa = { cx: FL + 7 + 11, cy: Y(FT - 9.9 - 7), w: 21.74, h: 10.87 };
+
+// Pieza de la perilla: estadio de 17 × 29,8 y rejilla de 5 ranuras (cálculo del modelo).
+const R = 8.5, H = 29.8, arriba = FT - 2;
+const rin = R - 1, cyl = H - R;
+const hw = (y: number) => (y <= cyl ? rin : Math.sqrt(Math.max(0, rin * rin - (y - cyl) * (y - cyl))));
+const t0 = H / 2 + 2;
+let b = H - 1;
+while (2 * Math.min(hw(b), hw(b - 1)) < 4) b -= 0.05;
+const p = (b - t0 - 1) / 4;
+const ranuras = Array.from({ length: 5 }, (_, i) => {
+  const yl = t0 + i * p;
+  const w = Math.min(hw(yl), hw(yl + 1));
+  return { x: f(PX - w), y: f(Y(arriba - yl)), w: f(2 * w) };
+});
+
+// Perilla Ø12 con 24 dientes.
+const perilla = { cx: PX, cy: Y(arriba - 8.5) };
+const dientes = Array.from({ length: 48 }, (_, i) => {
+  const a = (Math.PI * i) / 24, r = i % 2 ? 5.55 : 6;
+  return `${f(Math.cos(a) * r)},${f(Math.sin(a) * r)}`;
+}).join(' ');
+
+// Pata (legShape del modelo, alto 21,7), en coordenadas del SVG.
+function pata(Halto: number) {
+  const splay = 10, wt = 10, wb = 4.84, ap = 6, r = wb / 2, Hf = Halto - r;
+  const xo = (y: number) => 37 + (splay * y) / Hf;
+  const xia = xo(ap) - wt, xib = 37 + splay - wb, t = 1.4 / (Hf - ap), xic = xia + (xib - xia) * t;
+  const X = (x: number) => f(x - 18.5), V = (y: number) => f(46 + y);
+  return [
+    `M${X(0)} ${V(0)}`, `L${X(37)} ${V(0)}`, `L${X(37 + splay)} ${V(Hf)}`,
+    `A${r} ${r} 0 0 1 ${X(37 + splay - wb)} ${V(Hf)}`,
+    `L${X(xic)} ${V(ap + 1.4)}`, `Q${X(xia)} ${V(ap)} ${X(xia - 1.5)} ${V(ap)}`,
+    `L${X(37 - xia + 1.5)} ${V(ap)}`, `Q${X(37 - xia)} ${V(ap)} ${X(37 - xic)} ${V(ap + 1.4)}`,
+    `L${X(37 - xib)} ${V(Hf)}`, `A${r} ${r} 0 0 1 ${X(-splay)} ${V(Hf)}`, 'Z',
+  ].join(' ');
+}
+const dPata = pata(21.7);
+
+// Posición del canvas en % del dibujo (viewBox −34 0 68 72).
+const VB = { x: -34, y: 0, w: 68, h: 72 };
+const pantallaCss = {
+  left: `${(((activa.cx - activa.w / 2) - VB.x) / VB.w) * 100}%`,
+  top: `${((activa.cy - activa.h / 2) / VB.h) * 100}%`,
+  width: `${(activa.w / VB.w) * 100}%`,
+  height: `${(activa.h / VB.h) * 100}%`,
+};
+---
+<div class="tvm">
+  <svg class="tvm-dibujo" viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`} aria-hidden="true">
+    <defs>
+      <filter id="tvm-veta" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.03 0.9" numOctaves="2" seed="7" result="ruido" />
+        <feColorMatrix in="ruido" type="matrix" values="0 0 0 0 0.35  0 0 0 0 0.22  0 0 0 0 0.1  0 0 0 0.55 -0.12" result="vetas" />
+        <feComposite in="vetas" in2="SourceAlpha" operator="in" result="vetasDentro" />
+        <feMerge><feMergeNode in="SourceGraphic" /><feMergeNode in="vetasDentro" /></feMerge>
+      </filter>
+      <linearGradient id="tvm-luz" x1="0" y1="0" x2="0.35" y2="1">
+        <stop offset="0" stop-color="#fff" stop-opacity=".22" />
+        <stop offset=".55" stop-color="#fff" stop-opacity="0" />
+        <stop offset="1" stop-color="#000" stop-opacity=".18" />
+      </linearGradient>
+      <radialGradient id="tvm-sombra">
+        <stop offset="0" stop-color="#000" stop-opacity=".6" />
+        <stop offset="1" stop-color="#000" stop-opacity="0" />
+      </radialGradient>
+    </defs>
+
+    <!-- sombra en la mesa -->
+    <ellipse cx="0" cy="68.4" rx="33" ry="2.6" fill="url(#tvm-sombra)" />
+
+    <!-- patas (la de atrás asoma un poco más oscura) y base de imanes -->
+    <path d={dPata} fill="#b9a374" transform="translate(0 0.4)" />
+    <path d={dPata} fill="#e9d9a8" filter="url(#tvm-veta)" />
+    <path d={dPata} fill="url(#tvm-luz)" />
+    <polygon points={`-20.5,${Y(0)} 20.5,${Y(0)} 18.5,${Y(-4)} -18.5,${Y(-4)}`} fill="#e3d29f" filter="url(#tvm-veta)" />
+
+    <!-- caja: marco de MDF de 3 mm -->
+    <rect x="-30.5" y={Y(40)} width="61" height="40" rx="0.8" fill="#9a6b45" filter="url(#tvm-veta)" />
+    <!-- frente de madera blanca de 4 mm -->
+    <rect x="-27.4" y={Y(FT)} width="54.8" height={f(FT - 3.1)} fill="#e9d9a8" filter="url(#tvm-veta)" />
+    <rect x="-27.4" y={Y(FT)} width="54.8" height={f(FT - 3.1)} fill="url(#tvm-luz)" />
+    <!-- canto del frente (da relieve) -->
+    <rect x="-27.4" y={Y(FT)} width="54.8" height={f(FT - 3.1)} fill="none" stroke="#7a5a33" stroke-opacity=".35" stroke-width=".35" />
+
+    <!-- hueco de la pantalla y vidrio -->
+    <rect x={hueco.x} y={hueco.y} width={hueco.w} height={hueco.h} rx="1" fill="#05070a" />
+    <rect x={hueco.x} y={hueco.y} width={hueco.w} height={hueco.h} rx="1" fill="none" stroke="#6b4c2a" stroke-opacity=".5" stroke-width=".4" />
+
+    <!-- pieza de la perilla (MDF claro de 3 mm, en relieve) -->
+    <g class="tvm-pieza">
+      <rect x={f(PX - R + 0.35)} y={f(Y(arriba) + 0.5)} width="17" height={H} rx={R} fill="#000" opacity=".25" />
+      <rect x={f(PX - R)} y={Y(arriba)} width="17" height={H} rx={R} fill="#c49567" filter="url(#tvm-veta)" />
+      <rect x={f(PX - R)} y={Y(arriba)} width="17" height={H} rx={R} fill="url(#tvm-luz)" />
+      {ranuras.map((r) => <rect x={r.x} y={r.y} width={r.w} height="1" rx=".5" fill="#140d08" />)}
+    </g>
+
+    <!-- perilla Ø12 (gira cuando suena una canción) -->
+    <g transform={`translate(${perilla.cx} ${perilla.cy})`}>
+      <circle r="6.3" fill="#000" opacity=".3" transform="translate(.4 .6)" />
+      <g class="tvm-perilla">
+        <polygon points={dientes} fill="#2b1c13" />
+        <circle r="4.45" fill="#3a2719" />
+        <circle r="3.3" fill="none" stroke="#1d130c" stroke-width=".25" />
+        <circle r="1.3" fill="#d6d6d6" />
+        <rect x="-.35" y="-3.9" width=".7" height="2.3" rx=".2" fill="#f2e2bd" transform="rotate(-34)" />
+      </g>
+    </g>
+  </svg>
+
+  <div class="tvm-pantalla" style={pantallaCss}>
+    <canvas width="128" height="64" role="img" aria-label={etiqueta}></canvas>
+  </div>
+</div>
+
+<style>
+  .tvm { position: relative; width: 100%; }
+  .tvm-dibujo { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 18px 28px rgb(0 0 0 / .45)); }
+  .tvm-pantalla { position: absolute; }
+  .tvm-pantalla canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    /* mismos brillos que la pantalla de la app */
+    filter:
+      drop-shadow(0 0 1px rgba(77, 210, 255, .9))
+      drop-shadow(0 0 6px rgba(77, 210, 255, .35))
+      drop-shadow(0 0 16px rgba(77, 210, 255, .18));
+  }
+  .tvm-perilla { transform-box: fill-box; transform-origin: center; }
+  :global(.tv-sonando) .tvm-perilla { animation: tvm-girar 3s linear infinite; }
+  @keyframes tvm-girar { to { transform: rotate(360deg); } }
+</style>

@@ -25,4 +25,16 @@ if (existsSync(lista)) {
   console.log(`\n📷 Fotos que faltan en src/assets/fotos (${faltan.length} de ${esperadas.length}):\n`);
   faltan.forEach((f) => console.log(`  ${f.nombre.padEnd(22)} ${f.medida.padEnd(14)} ${f.que}`));
 }
+
+// Foto y GIF de muestra (los hizo Claude): cámbialos por unos reales tuyos.
+import { createHash } from 'node:crypto';
+const MUESTRAS = {
+  'public/demo/foto-demo.jpg': '2f444795591674f0c65409ae1f88d38a',
+  'public/demo/gif-demo.gif': '214938c4300bd20907a135649fc180f1',
+};
+const siguen = Object.entries(MUESTRAS).filter(([f, h]) => existsSync(join(raiz, f)) && createHash('md5').update(readFileSync(join(raiz, f))).digest('hex') === h);
+if (siguen.length) {
+  console.log('\n🖼  Muestras para cambiar por unas reales (mismo nombre de archivo):\n');
+  siguen.forEach(([f]) => console.log('  ' + f));
+}
 console.log('');

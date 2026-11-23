@@ -33,7 +33,7 @@ contacto:
   correo: "[PENDIENTE: correo de contacto]"
   # Usuarios sin la @. Si una red no la usas, déjala vacía: "".
   instagram: "[PENDIENTE: usuario de Instagram]"
-  tiktok: "[PENDIENTE: usuario de TikTok]"
+  tiktok: "cartadroid"
   facebook: "[PENDIENTE: usuario o página de Facebook]"
 
 # Tu comunidad de TikTok (sale debajo de los botones de la portada).
