@@ -1,0 +1,239 @@
+---
+/**
+ * "Funciones": lo que la TV hace además de mostrar contenido (eso ya está en
+ * "Mira lo que puede mostrar", así no se repite nada). Una función destacada
+ * con su demostración y el resto como filas con ícono, sin tarjetas.
+ */
+import { sitio } from '../lib/sitio';
+
+const f = sitio.funciones;
+const nombreVersion = (v: string) =>
+  v === 'wifi' ? `Solo ${sitio.versiones.find((x) => x.id === 'wifi')?.nombre ?? 'TV RETRO'}` : v === 'lite' ? `Solo ${sitio.versiones.find((x) => x.id === 'lite')?.nombre ?? 'Lite'}` : '';
+
+// Íconos propios, todos con el mismo trazo (24 × 24, 1,8 px).
+const ICONOS: Record<string, string> = {
+  compartir: '<circle cx="9" cy="8" r="3.2"/><path d="M3 19.5c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.2" cy="9" r="2.5"/><path d="M16 13.6c2.9.3 5 2.6 5 5.9"/>',
+  juegos: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M12 7.5v3"/><path d="M12 2v1.5M21.5 12H20M12 21.5V20M2.5 12H4"/>',
+  galeria: '<rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 15.5-5-5-9.5 9.5"/>',
+  actualizar: '<path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v4.5h-4.5"/><path d="M12 8v4l2.5 2"/>',
+  ajustes: '<path d="M4 7h9M18 7h2M4 17h3M12 17h8"/><circle cx="15.5" cy="7" r="2.3"/><circle cx="9.5" cy="17" r="2.3"/>',
+  bluetooth: '<path d="m7 7.5 10 9-5 4.5V3l5 4.5-10 9"/>',
+};
+const d = f.destacada;
+---
+<section class="funciones" id="funciones" aria-labelledby="funciones-titulo">
+  <div class="contenedor">
+    <header class="seccion-cabeza">
+      <h2 id="funciones-titulo">{f.titulo}</h2>
+      {f.subtitulo && <p>{f.subtitulo}</p>}
+    </header>
+
+    <div class="destacada">
+      <div class="destacada-texto">
+        {d.version && <span class="version">{nombreVersion(d.version)}</span>}
+        <h3>{d.titulo}</h3>
+        <p>{d.texto}</p>
+      </div>
+
+      <div class="envio" data-mensaje={d.mensaje} aria-hidden="true">
+        <div class="celular">
+          <div class="cel-barra"><span></span></div>
+          <div class="cel-chat">
+            <p class="cel-etiqueta">Enviar a la TV</p>
+            <div class="cel-campo"><span class="cel-texto"></span><span class="cel-cursor"></span></div>
+            <span class="cel-enviar">
+              <svg viewBox="0 0 24 24"><path d="M4 12 20 4l-4 16-4-6.5L4 12Z" fill="currentColor" /></svg>
+            </span>
+          </div>
+        </div>
+        <div class="trayecto"><span class="pulso"></span></div>
+        <div class="oled-app envio-pantalla"><canvas width="128" height="64"></canvas></div>
+      </div>
+    </div>
+
+    <ul class="lista" role="list">
+      {f.lista.map((x) => (
+        <li>
+          <svg class="icono" viewBox="0 0 24 24" aria-hidden="true" set:html={ICONOS[x.icono]} />
+          <div>
+            <h3>{x.titulo}</h3>
+            <p>{x.texto}</p>
+            {x.version && <span class="version">{nombreVersion(x.version)}</span>}
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<script>
+  import { PantallaApp } from '../scripts/oled/pantallaApp';
+
+  const envio = document.querySelector<HTMLElement>('.envio');
+  const lienzo = envio?.querySelector('canvas');
+  if (envio && lienzo) {
+    const mensaje = envio.dataset.mensaje ?? '¡Hola!';
+    const campo = envio.querySelector<HTMLElement>('.cel-texto')!;
+    const pantalla = new PantallaApp(lienzo);
+    const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const espera = (ms: number) => new Promise((ok) => setTimeout(ok, ms));
+    let corriendo = false;
+    let vuelta = 0;
+
+    // Un envío: se escribe en el celular, sale y aparece en la TV (dibujado por la app).
+    const ciclo = async (mia: number) => {
+      while (corriendo && mia === vuelta) {
+        envio.dataset.fase = 'escribir';
+        pantalla.texto({ texto: '' });
+        campo.textContent = '';
+        for (const letra of mensaje) {
+          if (!corriendo || mia !== vuelta) return;
+          campo.textContent += letra;
+          await espera(90);
+        }
+        await espera(500);
+        envio.dataset.fase = 'enviar';
+        await espera(700);
+        campo.textContent = '';
+        pantalla.texto({ texto: mensaje });
+        envio.dataset.fase = 'llego';
+        await espera(3200);
+      }
+    };
+
+    if (sinMovimiento) {
+      campo.textContent = '';
+      pantalla.texto({ texto: mensaje });
+      envio.dataset.fase = 'llego';
+    } else {
+      new IntersectionObserver(([e]) => {
+        if (e.isIntersecting && !corriendo) { corriendo = true; vuelta++; void ciclo(vuelta); }
+        else if (!e.isIntersecting) { corriendo = false; vuelta++; }
+      }, { threshold: 0.3 }).observe(envio);
+    }
+  }
+</script>
+
+<style>
+  .funciones { padding-block: clamp(56px, 10vw, 120px); }
+
+  .version {
+    display: inline-block;
+    margin-bottom: 10px;
+    padding: 3px 10px;
+    border-radius: var(--radio-pill);
+    background: var(--acento-fondo);
+    color: var(--acento);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* ---------- Función destacada ---------- */
+  .destacada {
+    display: grid;
+    gap: 28px;
+    align-items: center;
+    margin-top: 36px;
+    padding: clamp(22px, 4vw, 44px);
+    border-radius: var(--radio-lg);
+    border: 1px solid var(--borde);
+    background:
+      radial-gradient(70% 90% at 85% 50%, rgb(77 210 255 / .1), transparent 70%),
+      var(--superficie);
+  }
+  @media (min-width: 900px) { .destacada { grid-template-columns: 0.9fr 1.1fr; gap: 48px; } }
+  .destacada h3 { font-size: clamp(26px, 4vw, 36px); }
+  .destacada p { margin-top: 12px; color: var(--texto-2); font-size: 18px; max-width: 36ch; }
+
+  .envio { display: grid; grid-template-columns: auto 1fr minmax(0, 1.5fr); align-items: center; gap: 0; }
+  .celular {
+    width: clamp(108px, 28vw, 150px);
+    aspect-ratio: 9 / 17;
+    padding: 8px;
+    border-radius: 22px;
+    border: 2px solid var(--borde-fuerte);
+    background: #0E141C;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    box-shadow: 0 18px 30px -18px rgb(0 0 0 / .8);
+  }
+  .cel-barra { display: grid; place-items: center; height: 14px; }
+  .cel-barra span { width: 34%; height: 5px; border-radius: 3px; background: var(--borde-fuerte); }
+  .cel-chat { align-self: end; display: grid; gap: 6px; padding: 4px; }
+  .cel-etiqueta { font-size: 10px; color: var(--texto-2); }
+  .cel-campo {
+    min-height: 34px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: 1px solid var(--borde);
+    background: var(--superficie);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--texto);
+    word-break: break-word;
+  }
+  .cel-cursor { display: inline-block; width: 1.5px; height: 13px; margin-left: 1px; vertical-align: -2px; background: var(--acento); animation: parpadeo 1s steps(1) infinite; }
+  @keyframes parpadeo { 50% { opacity: 0; } }
+  .cel-enviar {
+    justify-self: end;
+    display: grid;
+    place-items: center;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--acento-relleno);
+    color: var(--sobre-acento);
+    transition: transform 160ms var(--salida);
+  }
+  .cel-enviar svg { width: 15px; height: 15px; }
+  .envio[data-fase="enviar"] .cel-enviar { transform: scale(.88); }
+
+  .trayecto { position: relative; height: 2px; margin-inline: 6px; background: repeating-linear-gradient(90deg, var(--borde-fuerte) 0 6px, transparent 6px 12px); }
+  .pulso {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 10px; height: 10px;
+    margin-top: -5px;
+    border-radius: 50%;
+    background: var(--acento);
+    box-shadow: 0 0 12px var(--acento);
+    opacity: 0;
+  }
+  .envio[data-fase="enviar"] .pulso { animation: viaje 700ms var(--salida) forwards; }
+  @keyframes viaje { 0% { left: 0; opacity: 1; } 100% { left: calc(100% - 10px); opacity: 1; } }
+
+  .envio-pantalla { transition: box-shadow .4s ease; }
+  .envio[data-fase="llego"] .envio-pantalla { box-shadow: inset 0 2px 6px rgba(0, 0, 0, .9), 0 0 40px -6px rgb(77 210 255 / .45); }
+
+  /* ---------- Las demás funciones: filas con ícono ---------- */
+  .lista {
+    list-style: none;
+    margin: 40px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0 48px;
+  }
+  @media (min-width: 760px) { .lista { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1100px) { .lista { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .lista li {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 16px;
+    padding-block: 22px;
+    border-top: 1px solid var(--borde);
+  }
+  .icono {
+    width: 44px; height: 44px;
+    padding: 9px;
+    border-radius: 12px;
+    background: var(--acento-fondo);
+    fill: none;
+    stroke: var(--acento);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .lista h3 { font-size: 19px; }
+  .lista p { margin-top: 6px; color: var(--texto-2); font-size: 16px; }
+  .lista .version { margin: 10px 0 0; }
+</style>

@@ -119,6 +119,58 @@ muestra:
         - "Suenan con la canción que quieras"
         - "Brillo y volumen a tu gusto"
 
+# Sección "Funciones". En cada una, version dice si es solo de una versión:
+# "wifi" (TV RETRO), "lite" (TV RETRO Lite) o "" (las dos).
+# icono: compartir, juegos, galeria, actualizar, ajustes, bluetooth.
+funciones:
+  titulo: "Hecha para usarla todos los días"
+  subtitulo: "Lo que la hace distinta a cualquier otro regalo."
+  destacada:
+    titulo: "Mándale algo aunque estés lejos"
+    texto: "Lo que envías desde la app llega a su pantalla esté donde esté: en otra casa o en otra ciudad."
+    version: "wifi"
+    # Mensaje de la animación (cortito).
+    mensaje: "¡Te extraño!"
+  lista:
+    - icono: "compartir"
+      titulo: "Compártela con tu gente"
+      texto: "Hasta 5 personas pueden enviarle cosas a la misma TV: tu familia, tu pareja o tus amigos."
+      version: "wifi"
+    - icono: "juegos"
+      titulo: "Juega con la rueda"
+      texto: "Trae 5 juegos que se manejan con el botón y la rueda de la TV."
+      version: "wifi"
+    - icono: "galeria"
+      titulo: "Galería lista para usar"
+      texto: "Decenas de imágenes y animaciones para enviar con un toque."
+      version: ""
+    - icono: "actualizar"
+      titulo: "Siempre al día"
+      texto: "Se actualiza sola por Wi-Fi y recibe mejoras nuevas."
+      version: "wifi"
+    - icono: "ajustes"
+      titulo: "A tu gusto"
+      texto: "Ajusta el brillo, el volumen y la zona horaria desde la app."
+      version: "wifi"
+    - icono: "bluetooth"
+      titulo: "Sin internet"
+      texto: "Se conecta directo a tu celular por Bluetooth: no necesita Wi-Fi."
+      version: "lite"
+
+# Sección "Cómo funciona" (3 pasos). Las pantallitas son las que muestra la TV real.
+pasos:
+  titulo: "Cómo funciona"
+  subtitulo: "Tres pasos, y solo la primera vez."
+  lista:
+    - titulo: "Conéctala a tu Wi-Fi"
+      texto: "Enchúfala y su pantalla te muestra un código QR. Escanéalo con tu celular y escoge tu red."
+    - titulo: "Vincúlala a tu cuenta"
+      texto: "Abre la app TV RETRO y escribe el código que aparece en la TV. Así queda a tu nombre."
+    - titulo: "Envíale lo que quieras"
+      texto: "Escribe un mensaje, elige una canción o una foto, y toca Enviar a la TV."
+  # Frase para la versión Lite (déjala vacía "" para ocultarla).
+  notaLite: "¿Tienes la Lite? Es aún más fácil: se empareja con tu celular por Bluetooth desde la misma app."
+
 # Videos de TikTok (se cargan solo cuando alguien les da play).
 # Pega el enlace COMPLETO del video, el que sale al abrirlo en el navegador:
 #   https://www.tiktok.com/@usuario/video/1234567890123456789

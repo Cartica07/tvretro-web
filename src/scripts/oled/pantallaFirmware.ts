@@ -143,3 +143,43 @@ export function mostrarRelojYAlarma(pantalla: PantallaApp): () => void {
   paso();
   return () => { vivo = false; clearTimeout(id); };
 }
+
+/* ------------------------------------------------------------------ */
+/*  Pantallas de la puesta en marcha (para "Cómo funciona")             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * QR del portal del Wi-Fi para la clave de ejemplo "m4ph7wke", armado con el
+ * MISMO qrcodegen.c del firmware y los mismos segmentos que conexion_wifi.cpp
+ * (versión 2, 25 × 25). Cada TV inventa su propia clave cada vez.
+ */
+const CLAVE_EJEMPLO = 'm4ph7wke';
+const QR_PORTAL: string[] = ['1111111001111011101111111','1000001010111110001000001','1011101001010011101011101','1011101011100010101011101','1011101001110001001011101','1000001010000000001000001','1111111010101010101111111','0000000000110101100000000','1111101110000011110101010','1010100011110011110011100','1000111110000100101110111','1110100000111110000000111','1100011000001100101100111','1111010010101011001000000','1010111110011010111001101','1001000101010011011000010','1001001100101001111110100','0000000011001000100010111','1111111011100100101011111','1000001001110110100010111','1011101010001101111111111','1011101011100001111000001','1011101011100111111101001','1000001011011101001110000','1111111010000011111111101'];
+
+/** conexion_wifi.cpp → dibujarPantallaPortalConQr(clave) + dibujarQr(false). */
+export function dibujarPortalQr() {
+  gfx.limpiar();
+  const columna = 62;
+  gfx.print('Escanea el', columna, 2, 1);
+  gfx.print('QR o une:', columna, 11, 1);
+  gfx.print('TV RETRO', columna, 25, 1);
+  gfx.print('Clave:', columna, 36, 1);
+  gfx.print(CLAVE_EJEMPLO, columna, 46, 1);
+  const QR_PX = 2, QR_MARGEN = 3, n = QR_PORTAL.length;
+  const lado = n * QR_PX + 2 * QR_MARGEN;
+  const y0 = Math.max(0, div(64 - lado, 2));
+  for (let y = 0; y < n; y++)
+    for (let x = 0; x < n; x++)
+      if (QR_PORTAL[y][x] === '1') gfx.fillRect(QR_MARGEN + x * QR_PX, y0 + QR_MARGEN + y * QR_PX, QR_PX, QR_PX);
+  return bitmapABase64(gfx.buf.slice());
+}
+
+/** pantalla.cpp → mostrarEmparejamiento(EMP_MOSTRANDO, codigo, segundos), sin el desvío anti-quemado. */
+export function dibujarVincular(codigo: string, segundosRestantes: number) {
+  gfx.limpiar();
+  const centrado = (t: string, y: number, tam: number) => gfx.print(t, div(ANCHO - gfx.ancho(t, tam), 2), y, tam);
+  centrado('VINCULAR TV', 2, 1);
+  centrado(codigo, 20, 3);
+  centrado(`Vence en ${div(segundosRestantes, 60)}:${String(segundosRestantes % 60).padStart(2, '0')}`, 54, 1);
+  return bitmapABase64(gfx.buf.slice());
+}

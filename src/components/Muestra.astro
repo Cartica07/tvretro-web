@@ -387,6 +387,8 @@ const ESTILOS = [
     box-shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 12px 32px -16px rgba(0, 0, 0, .7), 0 0 60px -24px rgb(77 210 255 / .35);
   }
 
+  .muestra-panel:not([hidden]) { animation: aparecer 180ms var(--salida); }
+  @keyframes aparecer { from { opacity: 0; transform: translateY(4px); } }
   .muestra-panel h3 { font-size: clamp(24px, 3.4vw, 32px); }
   .panel-texto { margin-top: 10px; color: var(--texto-2); font-size: 17px; max-width: 44ch; }
 
@@ -421,7 +423,7 @@ const ESTILOS = [
   .segmentos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: var(--radio-sm); background: #0E141C; border: 1px solid var(--borde); }
   .segmentos label { position: relative; }
   .segmentos input { position: absolute; opacity: 0; inset: 0; }
-  .segmentos span { display: grid; place-items: center; min-height: 40px; border-radius: 6px; font-weight: 600; font-size: 15px; color: var(--texto-2); cursor: pointer; transition: transform 160ms var(--salida), background-color .15s ease, color .15s ease; }
+  .segmentos span { display: grid; place-items: center; min-height: 44px; border-radius: 6px; font-weight: 600; font-size: 15px; color: var(--texto-2); cursor: pointer; transition: transform 160ms var(--salida), background-color .15s ease, color .15s ease; }
   .segmentos label:active span { transform: scale(.97); }
   .segmentos input:checked + span { background: var(--acento-relleno); color: var(--sobre-acento); }
   .segmentos input:focus-visible + span { outline: 3px solid var(--acento); outline-offset: 2px; }

@@ -61,6 +61,27 @@ const esquema = z.object({
       )
       .min(1),
   }),
+  funciones: z.object({
+    titulo: texto,
+    subtitulo: opcional,
+    destacada: z.object({ titulo: texto, texto: texto, version: z.enum(['wifi', 'lite', '']).default(''), mensaje: z.string().max(24) }),
+    lista: z.array(
+      z.object({
+        icono: z.enum(['compartir', 'juegos', 'galeria', 'actualizar', 'ajustes', 'bluetooth'], {
+          message: 'icono debe ser: compartir, juegos, galeria, actualizar, ajustes o bluetooth',
+        }),
+        titulo: texto,
+        texto: texto,
+        version: z.enum(['wifi', 'lite', '']).default(''),
+      }),
+    ),
+  }),
+  pasos: z.object({
+    titulo: texto,
+    subtitulo: opcional,
+    lista: z.array(z.object({ titulo: texto, texto: texto })).length(3, 'Deben ser exactamente 3 pasos'),
+    notaLite: opcional,
+  }),
   videos: z.object({
     titulo: texto,
     subtitulo: opcional,

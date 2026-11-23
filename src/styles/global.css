@@ -84,6 +84,11 @@ a { color: var(--acento); }
 h1, h2, h3 { line-height: 1.1; letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
 p { margin: 0; text-wrap: pretty; }
 
+/* 11: lo que dibuja el navegador también con los colores de la app */
+::selection { background: rgb(77 210 255 / .35); color: var(--texto); }
+html { scrollbar-color: var(--borde-fuerte) var(--fondo); }
+input, textarea { caret-color: var(--acento); }
+
 :focus-visible {
   outline: 3px solid var(--acento);
   outline-offset: 3px;
