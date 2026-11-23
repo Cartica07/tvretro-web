@@ -7,7 +7,7 @@
  */
 
 export type Nota = [frecuencia: number, tiempos: number];
-export type EstadoMusica = { avance: number; posicionTono: number; sonando: boolean };
+export type EstadoMusica = { avance: number; posicionTono: number; sonando: boolean; indice: number };
 
 // Frecuencias en Hz (0 = silencio).
 const G4 = 392, A4 = 440, B4 = 493.88, C5 = 523.25, D5 = 587.33, E5 = 659.25, F5 = 698.46, G5 = 783.99;
@@ -33,11 +33,17 @@ export class Buzzer {
   private fMin = 0;
   private fMax = 1;
   private temporizador = 0;
+  private alTerminar: (() => void) | null = null;
 
   get sonando() { return this.osc !== null; }
 
+  /**
+   * Toca una melodía. alTerminar se llama una sola vez: cuando acaba, cuando
+   * se detiene, o cuando otro botón de la página empieza otra canción.
+   */
   tocar(notas: Nota[], alTerminar: () => void) {
     this.detener();
+    this.alTerminar = alTerminar;
     const Contexto = window.AudioContext || (window as any).webkitAudioContext;
     this.audio ??= new Contexto();
     const a = this.audio;
@@ -76,15 +82,18 @@ export class Buzzer {
     this.duracion = t - this.inicio;
     this.osc.start(this.inicio);
     this.osc.stop(t + 0.05);
-    this.osc.onended = () => { if (this.osc) { this.limpiar(); alTerminar(); } };
+    this.osc.onended = () => this.detener();
     // Respaldo por si el navegador no avisa el final.
-    this.temporizador = window.setTimeout(() => { if (this.osc) { this.limpiar(); alTerminar(); } }, (t - a.currentTime + 0.4) * 1000);
+    this.temporizador = window.setTimeout(() => this.detener(), (t - a.currentTime + 0.4) * 1000);
   }
 
   detener() {
     if (!this.osc) return;
     try { this.osc.onended = null; this.osc.stop(); } catch { /* ya estaba detenido */ }
     this.limpiar();
+    const aviso = this.alTerminar;
+    this.alTerminar = null;
+    aviso?.();
   }
 
   private limpiar() {
@@ -101,10 +110,16 @@ export class Buzzer {
     const ahora = this.audio.currentTime;
     const nota = this.marcas.find((m) => ahora >= m.t && ahora < m.fin);
     const f = nota?.f ?? 0;
+    let indice = 0;
+    while (indice < this.marcas.length - 1 && this.marcas[indice + 1].t <= ahora) indice++;
     return {
+      indice,
       avance: Math.min(1, Math.max(0, (ahora - this.inicio) / this.duracion)),
       posicionTono: f ? (f - this.fMin) / (this.fMax - this.fMin || 1) : 0.5,
       sonando: !!nota && f > 0,
     };
   }
 }
+
+/** Un solo buzzer para toda la página: si suena en un lado, se calla en el otro. */
+export const buzzer = new Buzzer();

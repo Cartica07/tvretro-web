@@ -10,6 +10,14 @@ import { z } from 'astro/zod';
 // Se construye siempre desde la carpeta del proyecto.
 const RUTA = join(process.cwd(), 'contenido', 'sitio.yaml');
 
+/** true si el valor todavía es un marcador [PENDIENTE: ...]. */
+export const esPendiente = (v: string | undefined | null) => !v || /^\s*\[PENDIENTE/i.test(v);
+
+/** Número del video dentro de un enlace de TikTok, o null. */
+export function idVideoTikTok(enlace: string): string | null {
+  return enlace.match(/tiktok\.com\/(?:@[^/]+\/video|player\/v1|embed(?:\/v2)?)\/(\d{8,})/)?.[1] ?? null;
+}
+
 const texto = z.string();
 const opcional = z.string().default('');
 
@@ -37,6 +45,37 @@ const esquema = z.object({
     botonSecundario: texto,
     botonSonido: texto,
     destacados: z.array(z.string()).default([]),
+  }),
+  muestra: z.object({
+    titulo: texto,
+    subtitulo: opcional,
+    tipos: z
+      .array(
+        z.object({
+          id: z.enum(['mensajes', 'canciones', 'fotos', 'dibujos', 'gif', 'reloj'], {
+            message: 'id debe ser uno de: mensajes, canciones, fotos, dibujos, gif, reloj',
+          }),
+          nombre: texto,
+          titulo: texto,
+          texto: texto,
+          puntos: z.array(z.string()).default([]),
+        }),
+      )
+      .min(1),
+  }),
+  videos: z.object({
+    titulo: texto,
+    subtitulo: opcional,
+    lista: z
+      .array(
+        z.object({
+          enlace: z.string().refine((v) => esPendiente(v) || idVideoTikTok(v) !== null, {
+            message: 'Usa el enlace completo del video: https://www.tiktok.com/@usuario/video/1234567890…',
+          }),
+          titulo: opcional,
+        }),
+      )
+      .default([]),
   }),
   versiones: z
     .array(
@@ -75,9 +114,6 @@ function cargar(): Sitio {
 }
 
 export const sitio = cargar();
-
-/** true si el valor todavía es un marcador [PENDIENTE: ...]. */
-export const esPendiente = (v: string | undefined | null) => !v || /^\s*\[PENDIENTE/i.test(v);
 
 /** Quita los corchetes: "[PENDIENTE: x]" → "PENDIENTE: x". */
 export const textoPendiente = (v: string) => v.replace(/^\s*\[|\]\s*$/g, '');

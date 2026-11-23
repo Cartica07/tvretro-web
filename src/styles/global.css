@@ -162,3 +162,7 @@ p { margin: 0; text-wrap: pretty; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* ---------- Encabezado de cada sección ---------- */
+.seccion-cabeza h2 { font-size: clamp(30px, 6.4vw, 48px); font-weight: 700; }
+.seccion-cabeza p { margin-top: 10px; color: var(--texto-2); font-size: clamp(17px, 2.2vw, 19px); max-width: 46ch; }

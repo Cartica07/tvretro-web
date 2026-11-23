@@ -1,0 +1,231 @@
+---
+import { sitio } from '../lib/sitio';
+
+const m = sitio.muestra;
+const datos = JSON.stringify({ color: sitio.pantalla.color, mensajes: sitio.pantalla.mensajes });
+---
+<section class="muestra" id="muestra" aria-labelledby="muestra-titulo">
+  <div class="contenedor">
+    <header class="seccion-cabeza">
+      <h2 id="muestra-titulo">{m.titulo}</h2>
+      {m.subtitulo && <p>{m.subtitulo}</p>}
+    </header>
+
+    <div class="pestanas" role="tablist" aria-label="Tipos de contenido">
+      {m.tipos.map((t, i) => (
+        <button
+          type="button"
+          role="tab"
+          id={`pestana-${t.id}`}
+          aria-controls={`panel-${t.id}`}
+          aria-selected={i === 0 ? 'true' : 'false'}
+          tabindex={i === 0 ? 0 : -1}
+          data-tipo={t.id}
+        >
+          {t.nombre}
+        </button>
+      ))}
+    </div>
+
+    <div class="muestra-cuerpo">
+      <div class="muestra-pantalla" data-muestra={datos}>
+        <div class="mp-marco">
+          <canvas width="512" height="256" role="img" aria-label="Pantalla de la TV mostrando un ejemplo"></canvas>
+        </div>
+        <button class="mp-sonido boton-sonido-mini" type="button" aria-pressed="false" hidden>
+          <span aria-hidden="true" class="mp-icono">▶</span>
+          <span class="mp-texto" data-tocar="Escúchala con su letra" data-detener="Detener">Escúchala con su letra</span>
+        </button>
+      </div>
+
+      {m.tipos.map((t, i) => (
+        <div class="muestra-panel" role="tabpanel" id={`panel-${t.id}`} aria-labelledby={`pestana-${t.id}`} hidden={i !== 0}>
+          <h3>{t.titulo}</h3>
+          <p>{t.texto}</p>
+          {t.puntos.length > 0 && (
+            <ul>
+              {t.puntos.map((pt) => <li>{pt}</li>)}
+            </ul>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  import { PantallaPixel, Programacion } from '../scripts/tv/pantalla';
+  import { escenasDe, escenaCancionConLetra, FRASES_CUMPLE } from '../scripts/tv/demos';
+  import { buzzer, CUMPLEANOS } from '../scripts/tv/sonido';
+
+  const caja = document.querySelector<HTMLElement>('[data-muestra]');
+  const lienzo = caja?.querySelector('canvas');
+  if (caja && lienzo) {
+    const { color, mensajes } = JSON.parse(caja.dataset.muestra!) as { color: string; mensajes: string[] };
+    caja.style.setProperty('--color-pantalla', color);
+    const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const pantalla = new PantallaPixel(lienzo, color);
+    const pestanas = [...document.querySelectorAll<HTMLButtonElement>('.pestanas [role="tab"]')];
+    let tipo = pestanas[0]?.dataset.tipo ?? 'mensajes';
+    const programa = new Programacion(pantalla, escenasDe(tipo, mensajes), sinMovimiento);
+    programa.dibujarYa();
+
+    const sonido = caja.querySelector<HTMLButtonElement>('.mp-sonido')!;
+    const etiqueta = sonido.querySelector<HTMLElement>('.mp-texto')!;
+    let sonandoAqui = false;
+
+    let visible = false;
+    const actualizar = () => (visible && !document.hidden && (!sinMovimiento || sonandoAqui) ? programa.iniciar() : programa.detener());
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; actualizar(); }).observe(lienzo);
+    document.addEventListener('visibilitychange', actualizar);
+
+    const marcarSonido = (si: boolean) => {
+      sonandoAqui = si;
+      sonido.setAttribute('aria-pressed', String(si));
+      etiqueta.textContent = si ? etiqueta.dataset.detener! : etiqueta.dataset.tocar!;
+    };
+    const alTerminar = () => { marcarSonido(false); programa.soltar(); actualizar(); };
+
+    sonido.addEventListener('click', () => {
+      if (sonandoAqui) { buzzer.detener(); return; }
+      buzzer.tocar(CUMPLEANOS, alTerminar);
+      programa.fijar(escenaCancionConLetra('Cumpleaños feliz', FRASES_CUMPLE, () => buzzer.estado()));
+      marcarSonido(true);
+      actualizar();
+    });
+
+    const elegir = (b: HTMLButtonElement, enfocar = false) => {
+      if (sonandoAqui) buzzer.detener();
+      for (const otra of pestanas) {
+        const activa = otra === b;
+        otra.setAttribute('aria-selected', String(activa));
+        otra.tabIndex = activa ? 0 : -1;
+        document.getElementById(otra.getAttribute('aria-controls')!)!.hidden = !activa;
+      }
+      if (enfocar) b.focus();
+      b.scrollIntoView({ block: 'nearest', inline: 'center', behavior: sinMovimiento ? 'auto' : 'smooth' });
+      tipo = b.dataset.tipo!;
+      sonido.hidden = tipo !== 'canciones';
+      programa.cambiar(escenasDe(tipo, mensajes));
+    };
+
+    pestanas.forEach((b, i) => {
+      b.addEventListener('click', () => elegir(b));
+      b.addEventListener('keydown', (e) => {
+        const paso = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (e.key === 'Home') { e.preventDefault(); elegir(pestanas[0], true); }
+        else if (e.key === 'End') { e.preventDefault(); elegir(pestanas[pestanas.length - 1], true); }
+        else if (paso) { e.preventDefault(); elegir(pestanas[(i + paso + pestanas.length) % pestanas.length], true); }
+      });
+    });
+    sonido.hidden = tipo !== 'canciones';
+  }
+</script>
+
+<style>
+  .muestra { padding-block: clamp(48px, 9vw, 104px); }
+
+  .pestanas {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin: 28px calc(-1 * var(--margen)) 0;
+    padding: 4px var(--margen) 8px;
+    scroll-snap-type: x proximity;
+  }
+  .pestanas::-webkit-scrollbar { display: none; }
+  .pestanas button {
+    flex: none;
+    scroll-snap-align: center;
+    min-height: 44px;
+    padding: 8px 18px;
+    border-radius: var(--radio-pill);
+    border: 1px solid var(--borde);
+    background: var(--superficie);
+    color: var(--texto-2);
+    font: inherit;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+  }
+  .pestanas button:hover { color: var(--texto); border-color: var(--borde-fuerte); }
+  .pestanas button[aria-selected="true"] {
+    color: var(--sobre-acento);
+    background: var(--acento-relleno);
+    border-color: var(--acento-relleno);
+    box-shadow: 0 0 18px rgb(77 210 255 / .3);
+  }
+  @media (min-width: 900px) {
+    .pestanas { margin-inline: 0; padding-inline: 0; flex-wrap: wrap; }
+  }
+
+  .muestra-cuerpo {
+    display: grid;
+    gap: 24px;
+    margin-top: 18px;
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .muestra-cuerpo { grid-template-columns: 1.1fr 1fr; gap: 48px; margin-top: 28px; }
+  }
+
+  .muestra-pantalla { --color-pantalla: #4DD2FF; display: grid; gap: 14px; justify-items: center; }
+  .mp-marco {
+    width: 100%;
+    padding: 12px;
+    border-radius: 18px;
+    background: #05080B;
+    border: 1px solid var(--borde-fuerte);
+    box-shadow: 0 0 60px -18px rgb(77 210 255 / .35), 0 2px 10px rgb(0 0 0 / .8) inset;
+  }
+  .mp-marco canvas {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2 / 1;
+    border-radius: 6px;
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--color-pantalla) 55%, transparent));
+  }
+
+  .boton-sonido-mini {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 6px 18px 6px 6px;
+    border-radius: var(--radio-pill);
+    border: 1px solid var(--borde-fuerte);
+    background: var(--superficie);
+    color: var(--texto);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .boton-sonido-mini[hidden] { display: none; }
+  .boton-sonido-mini:hover, .boton-sonido-mini[aria-pressed="true"] { border-color: var(--acento); box-shadow: var(--brillo-cian); }
+  .mp-icono {
+    display: grid;
+    place-items: center;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--acento-relleno);
+    color: var(--sobre-acento);
+    font-size: 13px;
+  }
+  .boton-sonido-mini[aria-pressed="true"] .mp-icono { font-size: 0; }
+  .boton-sonido-mini[aria-pressed="true"] .mp-icono::before { content: ""; width: 10px; height: 10px; background: currentColor; border-radius: 2px; }
+
+  .muestra-panel h3 { font-size: clamp(24px, 3.4vw, 32px); }
+  .muestra-panel p { margin-top: 12px; color: var(--texto-2); font-size: 17px; max-width: 42ch; }
+  .muestra-panel ul { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 10px; }
+  .muestra-panel li { display: flex; gap: 12px; align-items: baseline; font-weight: 600; }
+  .muestra-panel li::before {
+    content: "";
+    flex: none;
+    width: 8px; height: 8px;
+    background: var(--acento);
+    box-shadow: 0 0 8px var(--acento);
+    transform: translateY(-2px);
+  }
+</style>

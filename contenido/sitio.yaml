@@ -66,6 +66,78 @@ portada:
     - "Se maneja desde el celular"
     - "Alarmas con tu canción"
 
+# Sección "Mira lo que puede mostrar". Puedes cambiar textos y el orden,
+# pero no el "id" (es el que decide qué animación sale en la pantallita).
+muestra:
+  titulo: "Mira lo que puede mostrar"
+  subtitulo: "Toca cada opción y mira la pantallita en acción."
+  tipos:
+    - id: "mensajes"
+      nombre: "Mensajes"
+      titulo: "Dile algo bonito, cuando quieras"
+      texto: "Lo escribes en la app y aparece en su TV. Ideal para un buenos días, un te quiero o un recordatorio."
+      puntos:
+        - "Varias letras y tamaños"
+        - "Texto que se desplaza"
+        - "Colores invertidos"
+    - id: "canciones"
+      nombre: "Canciones"
+      titulo: "Canciones que suenan y se ven"
+      texto: "Trae más de 50 canciones listas. Pueden sonar con letra e imágenes que cambian al ritmo de la música."
+      puntos:
+        - "+50 canciones incluidas"
+        - "Letra e imágenes al ritmo"
+        - "Úsalas también como alarma"
+    - id: "fotos"
+      nombre: "Fotos"
+      titulo: "Tus fotos, en versión retro"
+      texto: "Elige una foto del celular y la app la convierte en píxeles. También hay una galería con decenas de imágenes listas."
+      puntos:
+        - "Fotos del celular"
+        - "Galería lista para usar"
+        - "Ajustas el encuadre y el pixelado"
+    - id: "dibujos"
+      nombre: "Dibujos"
+      titulo: "Dibújale algo con el dedo"
+      texto: "Haz un dibujo a mano alzada en la app y mándaselo. Nadie más le va a dar un regalo así."
+      puntos:
+        - "Dibujo a mano alzada"
+        - "Deshacer y volver a intentar"
+        - "Guárdalos en tu galería"
+    - id: "gif"
+      nombre: "GIF"
+      titulo: "GIF y animaciones"
+      texto: "Que su TV se mueva: sube tus propios GIF o elige animaciones de la galería. Se repiten solas."
+      puntos:
+        - "Tus propios GIF"
+        - "Animaciones listas"
+        - "Se repiten en bucle"
+    - id: "reloj"
+      nombre: "Reloj"
+      titulo: "Reloj y alarmas con tu canción"
+      texto: "Muestra la hora y la fecha, y tiene hasta 3 alarmas que suenan solas con la canción que elijas."
+      puntos:
+        - "Hasta 3 alarmas"
+        - "Suenan con la canción que quieras"
+        - "Brillo y volumen a tu gusto"
+
+# Videos de TikTok (se cargan solo cuando alguien les da play).
+# Pega el enlace COMPLETO del video, el que sale al abrirlo en el navegador:
+#   https://www.tiktok.com/@usuario/video/1234567890123456789
+# Si quieres menos videos, borra el bloque completo (desde el guion).
+videos:
+  titulo: "Así suenan en TikTok"
+  subtitulo: "Las mismas canciones que suenan en la TV. Dale play."
+  lista:
+    - enlace: "[PENDIENTE: enlace del video 1]"
+      titulo: "[PENDIENTE: nombre de la canción 1]"
+    - enlace: "[PENDIENTE: enlace del video 2]"
+      titulo: "[PENDIENTE: nombre de la canción 2]"
+    - enlace: "[PENDIENTE: enlace del video 3]"
+      titulo: "[PENDIENTE: nombre de la canción 3]"
+    - enlace: "[PENDIENTE: enlace del video 4]"
+      titulo: "[PENDIENTE: nombre de la canción 4]"
+
 # Las dos versiones. estado: "disponible" o "proximamente".
 versiones:
   - id: "wifi"

@@ -11,8 +11,11 @@ const H = 64;
 const ESCALA = 4; // cada punto ocupa 4×4 px del lienzo…
 const PUNTO = 3; // …y se pinta de 3×3 (queda la rejilla entre puntos)
 
-const NOTA = String.fromCharCode(0x0e); // ♫ de la letra de la TV
-const CORAZON = String.fromCharCode(0x03); // ♥
+export const NOTA = String.fromCharCode(0x0e); // ♫ de la letra de la TV
+export const CORAZON = String.fromCharCode(0x03); // ♥
+
+/** Permite escribir ♥ ♪ ♫ en sitio.yaml: los pasa a los dibujitos de la letra de la TV. */
+export const aTV = (t: string) => t.replace(/♥|❤️?/g, CORAZON).replace(/♪/g, String.fromCharCode(0x0d)).replace(/♫/g, NOTA);
 
 export class PantallaPixel {
   private buf = new Uint8Array(W * H);
@@ -38,7 +41,10 @@ export class PantallaPixel {
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) r.fillRect(x * ESCALA, y * ESCALA, PUNTO, PUNTO);
   }
 
-  limpiar() { this.buf.fill(0); }
+  /** Colores invertidos: fondo encendido y letras apagadas. */
+  invertido = false;
+
+  limpiar() { this.buf.fill(0); this.invertido = false; }
 
   pixel(x: number, y: number) {
     x = Math.round(x); y = Math.round(y);
@@ -61,9 +67,10 @@ export class PantallaPixel {
     const c = this.ctx;
     c.drawImage(this.rejilla, 0, 0);
     c.fillStyle = this.color;
+    const prendido = this.invertido ? 0 : 1;
     for (let y = 0; y < H; y++) {
       for (let x = 0; x < W; x++) {
-        if (this.buf[y * W + x]) c.fillRect(x * ESCALA, y * ESCALA, PUNTO, PUNTO);
+        if (this.buf[y * W + x] === prendido) c.fillRect(x * ESCALA, y * ESCALA, PUNTO, PUNTO);
       }
     }
   }
@@ -73,10 +80,10 @@ export class PantallaPixel {
 /*  Escenas: cada una sabe cuánto dura y cómo se ve en el instante t.  */
 /* ------------------------------------------------------------------ */
 
-type Escena = { dura: number; dibujar: (p: PantallaPixel, t: number) => void };
+export type Escena = { dura: number; dibujar: (p: PantallaPixel, t: number) => void };
 
 /** Elige el tamaño de letra más grande con el que el mensaje cabe. */
-function acomodar(texto: string) {
+export function acomodar(texto: string) {
   for (const tam of [2, 1]) {
     const lineas = dividirEnLineas(texto, tam, W - 8);
     if (lineas.length * 8 * tam <= H - 8) return { tam, lineas };
@@ -86,7 +93,7 @@ function acomodar(texto: string) {
 
 /** La TV escribe un mensaje letra por letra, con cursor. */
 export function escenaEscribir(texto: string): Escena {
-  const { tam, lineas } = acomodar(texto);
+  const { tam, lineas } = acomodar(aTV(texto));
   const total = lineas.reduce((n, l) => n + l.length, 0);
   const paso = 85;
   return {
@@ -195,6 +202,15 @@ export class Programacion {
   /** Muestra una escena fuera de la lista (la canción) hasta que se llame a soltar(). */
   fijar(e: Escena) { this.especial = e; this.inicio = performance.now(); this.dibujarYa(); }
   soltar() { this.especial = null; this.siguiente(); }
+
+  /** Cambia la lista de escenas (pestañas de "Mira lo que puede mostrar"). */
+  cambiar(escenas: Escena[]) {
+    this.escenas = escenas;
+    this.indice = 0;
+    this.especial = null;
+    this.inicio = performance.now();
+    this.dibujarYa();
+  }
 
   iniciar() {
     if (this.corriendo) return;

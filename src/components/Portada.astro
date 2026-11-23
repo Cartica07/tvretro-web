@@ -84,7 +84,7 @@ const datosPantalla = JSON.stringify({ color: sitio.pantalla.color, mensajes: si
 
 <script>
   import { PantallaPixel, Programacion, escenaEscribir, escenaDibujo, escenaMusica, escenaReloj } from '../scripts/tv/pantalla';
-  import { Buzzer, CUMPLEANOS } from '../scripts/tv/sonido';
+  import { buzzer, CUMPLEANOS } from '../scripts/tv/sonido';
 
   const figura = document.querySelector<HTMLElement>('.tv[data-pantalla]');
   const lienzo = figura?.querySelector<HTMLCanvasElement>('canvas');
@@ -94,7 +94,6 @@ const datosPantalla = JSON.stringify({ color: sitio.pantalla.color, mensajes: si
 
     const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const pantalla = new PantallaPixel(lienzo, color);
-    const buzzer = new Buzzer();
 
     // Mensajes intercalados con dibujo, canción y reloj.
     const extras = [escenaDibujo(), escenaMusica('Tu canción'), escenaReloj()];
@@ -118,7 +117,7 @@ const datosPantalla = JSON.stringify({ color: sitio.pantalla.color, mensajes: si
     };
     const terminar = () => { marcar(false); programa.soltar(); actualizar(); };
     boton.addEventListener('click', () => {
-      if (buzzer.sonando) { buzzer.detener(); terminar(); return; }
+      if (buzzer.sonando && boton.getAttribute('aria-pressed') === 'true') { buzzer.detener(); return; }
       buzzer.tocar(CUMPLEANOS, terminar);
       programa.fijar(escenaMusica('Cumpleaños feliz', () => buzzer.estado()));
       marcar(true);
