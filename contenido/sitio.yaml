@@ -150,7 +150,7 @@ funciones:
     - icono: "actualizar"
       titulo: "Siempre al día"
       texto: "Se actualiza solo y cada vez trae mejoras."
-      version: "wifi"
+      version: ""
     - icono: "ajustes"
       titulo: "A tu gusto"
       texto: "Brillo, volumen y hora, como a ti te guste, desde la app."
@@ -210,7 +210,7 @@ comparar:
     - ["Quién le puede enviar", "Tú y hasta 5 personas más", "Tu celular"]
     - ["Funciona en", "Android (app), iPhone y computador (versión web)", "Android (app)"]
     - ["Juegos", "Sí, con su rueda", "No"]
-    - ["Se actualiza solo", "Sí", "Por ahora no"]
+    - ["Se actualiza solo", "Sí", "Sí"]
     - ["Pantalla", "1,3 pulgadas", "0,96 pulgadas"]
     - ["Batería", "Sí", "Sí"]
     - ["Canciones, mensajes, fotos, dibujos, GIF, reloj y alarmas", "Sí", "Sí"]
@@ -228,7 +228,7 @@ versiones:
       - "Le mandas lo que quieras desde cualquier lugar"
       - "Tu familia y tus amigos también le pueden enviar cosas"
       - "Juegos retro para pasar el rato"
-      - "Pantalla más grande, y se actualiza solo"
+      - "Pantalla más grande"
     funcionaEn: "Android con la app, y iPhone o computador con la versión web"
     # Lo que se ve en su pantallita (cortito).
     pantalla: "Te quiero mucho"
@@ -242,7 +242,7 @@ versiones:
     puntos:
       - "Sin Wi-Fi ni cuenta: lo emparejas una vez y listo"
       - "Lo que le mandas va directo de tu celular a Pepito"
-      - "Más pequeño, para el escritorio o la mesa de noche"
+      - "Más pequeño, lo puedes usar hasta de llavero"
     funcionaEn: "Solo Android, con la app"
     pantalla: "¡A darle!"
 
