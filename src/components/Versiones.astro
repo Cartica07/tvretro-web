@@ -5,6 +5,8 @@
  * Las dos TV se dibujan a escala por el tamaño de su pantalla (1,3" y 0,96")
  * hasta tener las medidas reales de cada caja.
  * Debajo: lo que traen las dos y, plegada, la tabla con todos los detalles.
+ * En celular (menos de 900 px) se ve UNA a la vez con el selector Pro | Lite,
+ * para no hacer tan larga la página; en computador, las dos lado a lado.
  */
 import { sitio, esPendiente, textoPendiente } from '../lib/sitio';
 import TvMadera from './TvMadera.astro';
@@ -23,9 +25,15 @@ const disponible = (e: string) => e === 'disponible';
       {c.subtitulo && <p>{c.subtitulo}</p>}
     </header>
 
+    <div class="v-elegir" role="group" aria-label="Elige una versión">
+      {versiones.map((v, i) => (
+        <button type="button" data-elegir={v.id} aria-pressed={i === 0 ? 'true' : 'false'}>{v.nombre}</button>
+      ))}
+    </div>
+
     <div class="v-grid">
       {versiones.map((v) => (
-        <article class="v" data-version={v.id} data-pantalla={v.pantalla} aria-labelledby={`v-${v.id}`}>
+        <article class="v" data-version={v.id} data-pantalla={v.pantalla} data-activa="true" aria-labelledby={`v-${v.id}`}>
           <div class="v-escena">
             <div class="v-tv" style={`--escala: ${ESCALA[v.id]}`}>
               <TvMadera sufijo={`-${v.id}`} etiqueta={`${v.nombre} mostrando «${v.pantalla}»`} />
@@ -105,13 +113,54 @@ const disponible = (e: string) => e === 'disponible';
     const lienzo = v.querySelector('canvas');
     if (lienzo) new PantallaApp(lienzo).texto({ texto: v.dataset.pantalla ?? '' }, false);
   }
+
+  // Selector Pro | Lite (solo se ve en celular; en computador salen las dos).
+  const botones = [...document.querySelectorAll<HTMLButtonElement>('[data-elegir]')];
+  const tarjetas = [...document.querySelectorAll<HTMLElement>('.v[data-version]')];
+  const elegir = (id: string) => {
+    for (const b of botones) b.setAttribute('aria-pressed', String(b.dataset.elegir === id));
+    for (const t of tarjetas) t.dataset.activa = String(t.dataset.version === id);
+  };
+  for (const b of botones) b.addEventListener('click', () => elegir(b.dataset.elegir!));
+  if (botones[0]) elegir(botones[0].dataset.elegir!);
 </script>
 
 <style>
-  .versiones { padding-block: clamp(56px, 10vw, 120px); }
+  .versiones { padding-block: clamp(44px, 10vw, 120px); }
 
-  .v-grid { display: grid; gap: 20px; margin-top: 36px; }
-  @media (min-width: 900px) { .v-grid { grid-template-columns: 1fr 1fr; gap: 24px; } }
+  .v-grid { display: grid; gap: 20px; margin-top: 16px; }
+  @media (min-width: 900px) { .v-grid { grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 36px; } }
+
+  /* Selector Pro | Lite: el mismo control segmentado de la muestra. */
+  .v-elegir {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin-top: 24px;
+    padding: 4px;
+    border-radius: var(--radio-pill);
+    border: 1px solid var(--borde);
+    background: var(--superficie);
+  }
+  .v-elegir button {
+    min-height: 44px;
+    border: 0;
+    border-radius: var(--radio-pill);
+    background: transparent;
+    color: var(--texto-2);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease, transform 160ms var(--salida);
+  }
+  .v-elegir button:active { transform: scale(.97); }
+  .v-elegir button[aria-pressed="true"] { background: var(--acento-relleno); color: var(--sobre-acento); }
+  @media (max-width: 899px) {
+    .v[data-activa="false"] { display: none; }
+    .v { transition: opacity 180ms var(--salida); }
+    @starting-style { .v[data-activa="true"] { opacity: 0; } }
+  }
+  @media (min-width: 900px) { .v-elegir { display: none; } }
 
   .v-grid > * { min-width: 0; }
   .v {
