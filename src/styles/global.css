@@ -176,10 +176,20 @@ input, textarea { caret-color: var(--acento); }
   text-transform: none;
 }
 
+/* Movimiento reducido: menos movimiento, no cero (Emil). Se quitan los
+   desplazamientos, giros y "hundidos"; quedan los fundidos cortos, que ayudan
+   a entender qué cambió. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-property: opacity, color, background-color, border-color, box-shadow !important; }
+  :active { transform: none !important; }
+  .entra { animation: fundido 240ms ease both !important; }
 }
+@keyframes fundido { from { opacity: 0; } }
+
+/* Entrada de la portada: una sola vez al cargar, en cascada corta. */
+@keyframes entra { from { opacity: 0; transform: translateY(10px); } }
+.entra { animation: entra 420ms var(--salida) both; animation-delay: calc(var(--i, 0) * 60ms); }
 
 /* ---------- Encabezado de cada sección ---------- */
 .seccion-cabeza h2 { font-size: clamp(30px, 6.4vw, 48px); font-weight: 700; }

@@ -388,8 +388,9 @@ const ESTILOS = [
     box-shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 12px 32px -16px rgba(0, 0, 0, .7), 0 0 60px -24px rgb(77 210 255 / .35);
   }
 
-  .muestra-panel:not([hidden]) { animation: aparecer 180ms var(--salida); }
-  @keyframes aparecer { from { opacity: 0; transform: translateY(4px); } }
+  /* Transición (no keyframes): si tocas pestañas rápido, sigue desde donde iba. */
+  .muestra-panel { transition: opacity 180ms var(--salida), transform 180ms var(--salida); }
+  @starting-style { .muestra-panel:not([hidden]) { opacity: 0; transform: translateY(4px); } }
 
   .panel-texto { margin-top: 10px; color: var(--texto-2); font-size: 17px; max-width: 44ch; }
 
@@ -431,8 +432,9 @@ const ESTILOS = [
   .segmentos input:focus-visible + span { outline: 3px solid var(--acento); outline-offset: 2px; }
 
   .interruptor { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; font-weight: 600; cursor: pointer; justify-self: start; }
-  .interruptor input { appearance: none; width: 46px; height: 28px; border-radius: 999px; background: #253041; position: relative; cursor: pointer; transition: background .15s ease; margin: 0; }
-  .interruptor input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--texto); transition: transform .15s ease; }
+  .interruptor input { appearance: none; width: 46px; height: 28px; border-radius: 999px; background: #253041; position: relative; cursor: pointer; transition: background-color .15s ease, transform 160ms var(--salida); margin: 0; }
+  .interruptor input:active { transform: scale(.97); }
+  .interruptor input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--texto); transition: transform 200ms var(--salida); }
   .interruptor input:checked { background: var(--acento-relleno); }
   .interruptor input:checked::after { transform: translateX(18px); background: var(--sobre-acento); }
   .interruptor input:focus-visible { outline: 3px solid var(--acento); outline-offset: 3px; }
