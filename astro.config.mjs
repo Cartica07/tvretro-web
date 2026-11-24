@@ -3,9 +3,15 @@ import { defineConfig, fontProviders } from 'astro/config';
 
 const fuente = (archivo, peso) => ({ src: [`./src/assets/fonts/${archivo}`], weight: peso, style: 'normal' });
 
+// Dónde se publica. En GitHub Pages lo pone el flujo .github/workflows/publicar.yml
+// (https://cartica07.github.io/tvretro-web/). En tu computador queda en la raíz.
+// Cuando tengas dominio propio: SITIO_URL = tu dominio y SITIO_BASE = "/".
+const SITIO_URL = process.env.SITIO_URL || undefined;
+const SITIO_BASE = process.env.SITIO_BASE || '/';
+
 export default defineConfig({
-  // Cuando tengas dominio, ponlo aquí también (sirve para el mapa del sitio y la vista previa al compartir).
-  // site: 'https://tudominio.co',
+  site: SITIO_URL,
+  base: SITIO_BASE,
   fonts: [
     {
       name: 'Space Grotesk',
