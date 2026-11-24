@@ -60,9 +60,10 @@ const ESTILOS = [
                       {ESTILOS.map(([v, n]) => <option value={v}>{n}</option>)}
                     </select>
                   </label>
-                  <label class="campo">
+                  <!-- "for": si no, el <output> de adentro se queda con el rótulo y el control no tiene nombre. -->
+                  <label class="campo" for="rangoTamano">
                     <span class="rotulo">Tamaño <output name="valorTamano">2</output></span>
-                    <input type="range" name="tamano" min="1" max="5" value="2" />
+                    <input type="range" id="rangoTamano" name="tamano" min="1" max="5" value="2" />
                   </label>
                 </div>
                 <div class="segmentos" role="radiogroup" aria-label="Modo">
@@ -104,9 +105,9 @@ const ESTILOS = [
                   <canvas id="lienzoDibujo" width="128" height="64" aria-label="Lienzo para dibujar con el dedo"></canvas>
                   <span class="lienzo-pista" aria-hidden="true">Dibuja aquí con el dedo</span>
                 </div>
-                <label class="campo">
+                <label class="campo" for="rangoGrosor">
                   <span class="rotulo">Grosor <output name="valorGrosor">2</output></span>
-                  <input type="range" name="grosor" min="1" max="6" value="2" />
+                  <input type="range" id="rangoGrosor" name="grosor" min="1" max="6" value="2" />
                 </label>
                 <div class="fila-botones">
                   <button type="button" class="boton boton-secundario boton-chico" data-accion="deshacer">Deshacer</button>
@@ -335,8 +336,8 @@ const ESTILOS = [
     gap: 8px;
     overflow-x: auto;
     scrollbar-width: none;
-    margin: 28px calc(-1 * var(--margen)) 0;
-    padding: 4px var(--margen) 8px;
+    margin: 24px calc(-1 * var(--margen)) 0;
+    padding: 8px var(--margen) 10px; /* el anillo de foco (6 px) no se corta */
     scroll-snap-type: x proximity;
   }
   .pestanas::-webkit-scrollbar { display: none; }
@@ -389,7 +390,7 @@ const ESTILOS = [
 
   .muestra-panel:not([hidden]) { animation: aparecer 180ms var(--salida); }
   @keyframes aparecer { from { opacity: 0; transform: translateY(4px); } }
-  .muestra-panel h3 { font-size: clamp(24px, 3.4vw, 32px); }
+
   .panel-texto { margin-top: 10px; color: var(--texto-2); font-size: 17px; max-width: 44ch; }
 
   .pruebalo {
@@ -418,6 +419,7 @@ const ESTILOS = [
   textarea { resize: vertical; min-height: 64px; }
   select { min-height: 44px; }
   textarea:focus, select:focus { border-color: var(--acento); outline: none; box-shadow: 0 0 0 3px rgb(77 210 255 / .2); }
+  textarea:focus-visible, select:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
   input[type="range"] { width: 100%; accent-color: var(--acento-relleno); min-height: 32px; }
 
   .segmentos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: var(--radio-sm); background: #0E141C; border: 1px solid var(--borde); }

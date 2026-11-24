@@ -58,13 +58,21 @@ const lite = p.lite?.titulo ? p.lite : null;
   const lienzos = [...document.querySelectorAll<HTMLCanvasElement>('.paso-pantalla canvas, .lite-pantalla canvas')];
   if (lienzos.length) {
     const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const relojes: number[] = [];
-    // Cuenta hacia atrás cada segundo, como en la TV; al llegar a 0 vuelve a empezar.
-    const cuentaAtras = (desde: number, total: number, pinta: (s: number) => void) => {
-      let s = desde;
-      const paso = () => { pinta(s); s = s > 0 ? s - 1 : total; };
-      paso();
-      if (!sinMovimiento) relojes.push(window.setInterval(paso, 1000));
+    // Cuenta hacia atrás como en la TV, pero solo unos segundos cuando la ves
+    // y luego queda quieta (nada se mueve más de 5 s sin poder detenerlo).
+    const SEGUNDOS = 4;
+    const cuentaAtras = (lienzo: HTMLCanvasElement, desde: number, pinta: (s: number) => void) => {
+      pinta(desde);
+      if (sinMovimiento) return;
+      new IntersectionObserver(([e], obs) => {
+        if (!e.isIntersecting) return;
+        obs.disconnect();
+        let s = desde;
+        const reloj = window.setInterval(() => {
+          pinta(--s);
+          if (desde - s >= SEGUNDOS) clearInterval(reloj);
+        }, 1000);
+      }, { threshold: 0.6 }).observe(lienzo);
     };
     const arrancar = () => {
       for (const c of lienzos) {
@@ -73,14 +81,13 @@ const lite = p.lite?.titulo ? p.lite : null;
         if (tipo === 'qr') p.imagen(dibujarPortalQr());
         if (tipo === 'mensaje') p.texto({ texto: '¡Hola, Ana!' });
         // El código de la Pro vence a los 10 minutos; el PIN de la Lite, a los 5.
-        if (tipo === 'vincular') cuentaAtras(9 * 60 + 41, 599, (s) => p.imagen(dibujarVincular('K7M4PQ', s)));
-        if (tipo === 'emparejar') cuentaAtras(4 * 60 + 52, 299, (s) => p.imagen(dibujarEmparejarLite('482915', s)));
+        if (tipo === 'vincular') cuentaAtras(c, 9 * 60 + 41, (s) => p.imagen(dibujarVincular('K7M4PQ', s)));
+        if (tipo === 'emparejar') cuentaAtras(c, 4 * 60 + 52, (s) => p.imagen(dibujarEmparejarLite('482915', s)));
       }
     };
     new IntersectionObserver((e, obs) => {
       if (e.some((x) => x.isIntersecting)) { obs.disconnect(); arrancar(); }
     }, { rootMargin: '200px' }).observe(lienzos[0]);
-    document.addEventListener('visibilitychange', () => { if (document.hidden) relojes.forEach(clearInterval); });
   }
 </script>
 
@@ -109,7 +116,7 @@ const lite = p.lite?.titulo ? p.lite : null;
     font-weight: 700;
     font-size: 16px;
   }
-  .paso-texto h3 { font-size: 21px; line-height: 34px; }
+  .paso-texto h3 { line-height: 34px; }
   .paso-texto p { margin-top: 6px; color: var(--texto-2); font-size: 16px; max-width: 34ch; }
 
   .lite {
@@ -122,7 +129,6 @@ const lite = p.lite?.titulo ? p.lite : null;
     align-items: center;
   }
   .lite-pantalla { border-radius: 12px; }
-  .lite-texto h3 { font-size: 19px; }
   .lite-texto p { margin-top: 6px; color: var(--texto-2); font-size: 16px; max-width: 52ch; }
   @media (min-width: 600px) {
     .lite { grid-template-columns: minmax(0, 220px) 1fr; padding: 20px 24px 20px 20px; gap: 24px; }

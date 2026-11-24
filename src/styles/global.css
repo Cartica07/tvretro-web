@@ -82,6 +82,8 @@ a { color: var(--acento); }
 }
 
 h1, h2, h3 { line-height: 1.1; letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+/* Un solo tamaño para todos los h3 de la página (escala: h1 > h2 > h3). */
+h3 { font-size: clamp(20px, 2vw, 22px); }
 p { margin: 0; text-wrap: pretty; }
 
 /* 11: lo que dibuja el navegador también con los colores de la app */

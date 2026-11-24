@@ -32,6 +32,7 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
         <figcaption class="solo-lectores">Pepito, el televisorcito de madera, con su pantalla mostrando lo que le envías desde el celular.</figcaption>
       </figure>
 
+      <div class="portada-controles">
       <button class="boton-sonido" type="button" aria-pressed="false" aria-describedby="nota-volumen">
         <span class="bs-icono" aria-hidden="true">
           <svg class="bs-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5L8 5.5Z" fill="currentColor" /></svg>
@@ -40,6 +41,12 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
         <span class="bs-texto" data-tocar={p.botonSonido} data-detener="Detener">{p.botonSonido}</span>
         <svg class="bs-parlante" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4v-5Z" fill="currentColor" /><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
       </button>
+      <!-- Pausa: lo que se mueve más de 5 s necesita una forma de detenerlo (accesibilidad). -->
+      <button class="boton-pausa" type="button" aria-pressed="false" aria-label="Pausar la pantalla" data-pausar="Pausar la pantalla" data-seguir="Seguir mostrando">
+        <svg class="bp-pausa" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5h2.6v13H8zM13.4 5.5H16v13h-2.6z" fill="currentColor" /></svg>
+        <svg class="bp-seguir" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5L8 5.5Z" fill="currentColor" /></svg>
+      </button>
+      </div>
     </div>
 
     <p id="nota-volumen" class="solo-lectores">Sube el volumen: suena como Pepito de verdad.</p>
@@ -107,7 +114,17 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
     const pausar = () => { corriendo = false; clearTimeout(temporizador); if (!ocupada) pantalla.detener(); };
 
     let visible = true;
-    const actualizar = () => (visible && !document.hidden ? iniciar() : pausar());
+    let pausadaPorTi = false;
+    const actualizar = () => (visible && !document.hidden && !pausadaPorTi ? iniciar() : pausar());
+
+    const botonPausa = document.querySelector<HTMLButtonElement>('.boton-pausa')!;
+    if (sinMovimiento) botonPausa.hidden = true; // ya está quieta
+    botonPausa.addEventListener('click', () => {
+      pausadaPorTi = !pausadaPorTi;
+      botonPausa.setAttribute('aria-pressed', String(pausadaPorTi));
+      botonPausa.setAttribute('aria-label', pausadaPorTi ? botonPausa.dataset.seguir! : botonPausa.dataset.pausar!);
+      actualizar();
+    });
     new IntersectionObserver(([e]) => { visible = e.isIntersecting; actualizar(); }).observe(lienzo);
     document.addEventListener('visibilitychange', actualizar);
 
@@ -125,6 +142,7 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
       pantalla.detener();
       clearTimeout(temporizador);
       if (corriendo) void siguiente();
+      else if (pausadaPorTi) void pasos[(indice + pasos.length - 1) % pasos.length].mostrar();
     };
     boton.addEventListener('click', async () => {
       if (ocupada) { buzzer.detener(); return; }
@@ -257,6 +275,27 @@ const datosPantalla = JSON.stringify({ mensajes: sitio.pantalla.mensajes });
     .boton-sonido:hover { border-color: var(--acento); box-shadow: var(--brillo-cian); }
   }
   .boton-sonido:active { transform: scale(.97); }
+
+  .portada-controles { display: flex; justify-content: center; align-items: center; gap: 10px; }
+  .boton-pausa {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--borde);
+    background: var(--superficie);
+    color: var(--texto-2);
+    cursor: pointer;
+    transition: border-color .15s ease, color .15s ease, transform 160ms var(--salida);
+  }
+  .boton-pausa svg { width: 18px; height: 18px; }
+  .boton-pausa .bp-seguir, .boton-pausa[aria-pressed="true"] .bp-pausa { display: none; }
+  .boton-pausa[aria-pressed="true"] .bp-seguir { display: block; }
+  .boton-pausa:active { transform: scale(.97); }
+  @media (hover: hover) and (pointer: fine) {
+    .boton-pausa:hover { border-color: var(--acento); color: var(--acento); }
+  }
   .bs-parlante { width: 20px; height: 20px; color: var(--texto-2); margin-left: -2px; }
   .bs-icono {
     display: grid;
