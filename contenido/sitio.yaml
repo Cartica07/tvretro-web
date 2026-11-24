@@ -3,6 +3,9 @@
 # ---------------------------------------------------------------------
 #  Aquí cambias textos, precios, contacto y enlaces SIN tocar el código.
 #
+#  Tono: vender, no explicar. Frases cortas y con ganas; nada de cifras
+#  técnicas (pulgadas, cantidades exactas) salvo en la tabla de diferencias.
+#
 #  Reglas sencillas:
 #   1. No borres ni cambies los nombres que van antes de los dos puntos (:).
 #   2. Los textos van entre comillas "así".
@@ -60,12 +63,12 @@ portada:
   botonSonido: "Escucha cómo suena"
   # Datos cortos que salen en una línea debajo del subtítulo.
   destacados:
-    - "+50 canciones incluidas"
-    - "Se maneja desde el celular"
-    - "Alarmas con tu canción"
+    - "Decenas de canciones incluidas"
+    - "Lo manejas desde tu celular"
+    - "Te despierta con tu canción"
 
-# Sección "Todo lo que le puedes mandar a Pepito" (antes "Mira lo que puede mostrar"). Puedes cambiar textos y el orden,
-# pero no el "id" (es el que decide qué animación sale en la pantallita).
+# Sección "Todo lo que le puedes mandar a Pepito". Puedes cambiar textos y el
+# orden, pero no el "id" (es el que decide qué animación sale en la pantallita).
 muestra:
   titulo: "Todo lo que le puedes mandar a Pepito"
   subtitulo: "Toca cada opción y mira la pantallita en acción."
@@ -73,50 +76,50 @@ muestra:
     - id: "mensajes"
       nombre: "Mensajes"
       titulo: "Dile algo bonito, cuando quieras"
-      texto: "Lo escribes en la app y aparece en Pepito. Ideal para un buenos días, un te quiero o un recordatorio."
+      texto: "Un buenos días, un te quiero o un «ya voy en camino». Lo escribes en tu celular y aparece en su pantalla."
       puntos:
-        - "Varias letras y tamaños"
-        - "Texto que se desplaza"
-        - "Colores invertidos"
+        - "Con la letra que más te guste"
+        - "Grande, pequeño o en movimiento"
+        - "Llega en segundos"
     - id: "canciones"
       nombre: "Canciones"
       titulo: "Canciones que suenan y se ven"
-      texto: "Trae más de 50 canciones listas. Pueden sonar con letra e imágenes que cambian al ritmo de la música."
+      texto: "Elige una y Pepito la canta, con la letra en pantalla y animaciones al ritmo de la música."
       puntos:
-        - "+50 canciones incluidas"
-        - "Letra e imágenes al ritmo"
-        - "Úsalas también como alarma"
+        - "Decenas de canciones incluidas"
+        - "Con letra y animaciones"
+        - "También como alarma"
     - id: "fotos"
       nombre: "Fotos"
       titulo: "Tus fotos, en versión retro"
-      texto: "Elige una foto del celular y la app la convierte en píxeles. También hay una galería con decenas de imágenes listas."
+      texto: "Escoge una foto y mírala convertida en arte de píxeles. O usa una de las muchas que ya trae."
       puntos:
-        - "Fotos del celular"
-        - "Galería lista para usar"
-        - "Ajustas el encuadre y el pixelado"
+        - "Directo desde tu celular"
+        - "Galería incluida"
+        - "Estilo retro de verdad"
     - id: "dibujos"
       nombre: "Dibujos"
       titulo: "Dibújale algo con el dedo"
-      texto: "Haz un dibujo a mano alzada en la app y mándaselo. Nadie más le va a dar un regalo así."
+      texto: "Hazle un dibujo con el dedo y mándaselo. Nadie más le va a dar un regalo así."
       puntos:
-        - "Dibujo a mano alzada"
-        - "Deshacer y volver a intentar"
-        - "Guárdalos en tu galería"
+        - "Hecho por ti"
+        - "Llega tal cual lo dibujaste"
+        - "Guárdalos para después"
     - id: "gif"
       nombre: "GIF"
       titulo: "GIF y animaciones"
-      texto: "Ponle movimiento: sube tus propios GIF o elige animaciones de la galería. Se repiten solas."
+      texto: "Dale vida a su pantalla con tus GIF favoritos o con las animaciones que ya trae."
       puntos:
         - "Tus propios GIF"
-        - "Animaciones listas"
-        - "Se repiten en bucle"
+        - "Animaciones incluidas"
+        - "Se repiten solas"
     - id: "reloj"
       nombre: "Reloj"
       titulo: "Reloj y alarmas con tu canción"
-      texto: "Muestra la hora y la fecha, y tiene hasta 3 alarmas que suenan solas con la canción que elijas."
+      texto: "Pepito también te da la hora y te despierta con la canción que más te gusta."
       puntos:
-        - "Hasta 3 alarmas"
-        - "Suenan con la canción que quieras"
+        - "La hora siempre a la vista"
+        - "Alarmas con tu canción"
         - "Brillo y volumen a tu gusto"
 
 # Sección "Funciones". En cada una, version dice si es solo de una versión:
@@ -134,27 +137,27 @@ funciones:
   lista:
     - icono: "compartir"
       titulo: "Compártelo con tu gente"
-      texto: "Hasta 5 personas pueden enviarle cosas al mismo Pepito: tu familia, tu pareja o tus amigos."
+      texto: "Tu familia, tu pareja o tus amigos también le pueden mandar cosas al mismo Pepito."
       version: "wifi"
     - icono: "juegos"
-      titulo: "Juega con la rueda"
-      texto: "Trae 5 juegos que se manejan con el botón y la rueda de Pepito."
+      titulo: "Juegos retro para pasar el rato"
+      texto: "Varios juegos clásicos y divertidos que manejas con su rueda."
       version: "wifi"
     - icono: "galeria"
       titulo: "Galería lista para usar"
-      texto: "Decenas de imágenes y animaciones para enviar con un toque."
+      texto: "Muchas imágenes y animaciones listas para enviar con un toque."
       version: ""
     - icono: "actualizar"
       titulo: "Siempre al día"
-      texto: "Se actualiza solo por Wi-Fi y recibe mejoras nuevas."
+      texto: "Se actualiza solo y cada vez trae mejoras."
       version: "wifi"
     - icono: "ajustes"
       titulo: "A tu gusto"
-      texto: "Ajusta el brillo, el volumen y la zona horaria desde la app."
+      texto: "Brillo, volumen y hora, como a ti te guste, desde la app."
       version: ""
     - icono: "bluetooth"
-      titulo: "Sin internet"
-      texto: "Se conecta directo a tu celular por Bluetooth, sin Wi-Fi ni cuenta. Solo necesitas internet la primera vez."
+      titulo: "Sin Wi-Fi, sin enredos"
+      texto: "Se conecta directo a tu celular por Bluetooth. Lo emparejas una vez y a darle."
       version: "lite"
 
 # Sección "Cómo funciona" (3 pasos de Pepito Pro). Las pantallitas son las que
@@ -164,16 +167,16 @@ pasos:
   subtitulo: "Tres pasos, y solo la primera vez."
   lista:
     - titulo: "Conéctalo a tu Wi-Fi"
-      texto: "Enchúfalo y su pantalla te muestra un código QR. Escanéalo con tu celular y escoge tu red."
+      texto: "Escanea con tu celular el código que aparece en su pantalla y escoge tu red."
     - titulo: "Vincúlalo a tu cuenta"
-      texto: "Abre la app Pepito y escribe el código que aparece en su pantalla. Así queda a tu nombre."
-    - titulo: "Envíale lo que quieras"
-      texto: "Escribe un mensaje, elige una canción o una foto, y toca Enviar a Pepito."
+      texto: "Escribe en la app el código que te muestra. Así queda a tu nombre."
+    - titulo: "Mándale lo que quieras"
+      texto: "Un mensaje, una canción, una foto… y le llega en segundos."
   # Recuadro de la versión Lite, con la pantalla de emparejar copiada de su
   # firmware. Deja el título vacío ("") para ocultarlo.
   lite:
     titulo: "¿Tienes Pepito Lite? Es aún más fácil"
-    texto: "Enciéndelo y verás un PIN en su pantalla. En la app toca «Abrir Bluetooth», elige «Pepito Lite» y escribe el PIN. No necesita Wi-Fi ni cuenta."
+    texto: "Lo emparejas por Bluetooth con el PIN que aparece en su pantalla, y listo. Sin Wi-Fi ni cuenta."
 
 # Videos de TikTok (se cargan solo cuando alguien les da play).
 # Pega el enlace COMPLETO del video, el que sale al abrirlo en el navegador:
