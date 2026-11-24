@@ -64,10 +64,10 @@ portada:
     - "Se maneja desde el celular"
     - "Alarmas con tu canción"
 
-# Sección "Mira lo que puede mostrar". Puedes cambiar textos y el orden,
+# Sección "Todo lo que le puedes mandar a Pepito" (antes "Mira lo que puede mostrar"). Puedes cambiar textos y el orden,
 # pero no el "id" (es el que decide qué animación sale en la pantallita).
 muestra:
-  titulo: "Mira lo que puede mostrar"
+  titulo: "Todo lo que le puedes mandar a Pepito"
   subtitulo: "Toca cada opción y mira la pantallita en acción."
   tipos:
     - id: "mensajes"
