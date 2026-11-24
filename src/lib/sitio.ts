@@ -107,9 +107,20 @@ const esquema = z.object({
         }),
         precio: texto,
         mensajeWhatsApp: texto,
+        para: texto,
+        lema: opcional,
+        puntos: z.array(texto).min(1).max(6),
+        funcionaEn: texto,
+        pantalla: z.string().max(24, 'pantalla: máximo 24 letras'),
       }),
     )
     .length(2),
+  comparar: z.object({
+    titulo: texto,
+    subtitulo: opcional,
+    comunes: opcional,
+    diferencias: z.array(z.tuple([texto, texto, texto])).default([]),
+  }),
   legal: z.object({ privacidad: texto, terminos: texto }),
 });
 

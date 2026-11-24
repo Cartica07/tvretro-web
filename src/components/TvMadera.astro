@@ -9,8 +9,10 @@
  * El canvas de la pantalla (128×64) va encima, en el área activa de la OLED
  * (21,74 × 10,87 mm), y lo dibuja el mismo código de la app.
  */
-interface Props { etiqueta: string }
-const { etiqueta } = Astro.props;
+interface Props { etiqueta: string; sufijo?: string }
+// sufijo: para usar varias TV en la misma página sin repetir los id del SVG.
+const { etiqueta, sufijo = '' } = Astro.props;
+const idv = `tvm-veta${sufijo}`, idl = `tvm-luz${sufijo}`, ids = `tvm-sombra${sufijo}`;
 
 // En el SVG, y crece hacia abajo: svgY = 42 − y del modelo.
 const Y = (y: number) => +(42 - y).toFixed(2);
@@ -70,37 +72,37 @@ const pantallaCss = {
 <div class="tvm">
   <svg class="tvm-dibujo" viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`} aria-hidden="true">
     <defs>
-      <filter id="tvm-veta" x="0" y="0" width="100%" height="100%">
+      <filter id={idv} x="0" y="0" width="100%" height="100%">
         <feTurbulence type="fractalNoise" baseFrequency="0.03 0.9" numOctaves="2" seed="7" result="ruido" />
         <feColorMatrix in="ruido" type="matrix" values="0 0 0 0 0.35  0 0 0 0 0.22  0 0 0 0 0.1  0 0 0 0.55 -0.12" result="vetas" />
         <feComposite in="vetas" in2="SourceAlpha" operator="in" result="vetasDentro" />
         <feMerge><feMergeNode in="SourceGraphic" /><feMergeNode in="vetasDentro" /></feMerge>
       </filter>
-      <linearGradient id="tvm-luz" x1="0" y1="0" x2="0.35" y2="1">
+      <linearGradient id={idl} x1="0" y1="0" x2="0.35" y2="1">
         <stop offset="0" stop-color="#fff" stop-opacity=".22" />
         <stop offset=".55" stop-color="#fff" stop-opacity="0" />
         <stop offset="1" stop-color="#000" stop-opacity=".18" />
       </linearGradient>
-      <radialGradient id="tvm-sombra">
+      <radialGradient id={ids}>
         <stop offset="0" stop-color="#000" stop-opacity=".6" />
         <stop offset="1" stop-color="#000" stop-opacity="0" />
       </radialGradient>
     </defs>
 
     <!-- sombra en la mesa -->
-    <ellipse cx="0" cy="68.4" rx="33" ry="2.6" fill="url(#tvm-sombra)" />
+    <ellipse cx="0" cy="68.4" rx="33" ry="2.6" fill={`url(#${ids})`} />
 
     <!-- patas (la de atrás asoma un poco más oscura) y base de imanes -->
     <path d={dPata} fill="#b9a374" transform="translate(0 0.4)" />
-    <path d={dPata} fill="#e9d9a8" filter="url(#tvm-veta)" />
-    <path d={dPata} fill="url(#tvm-luz)" />
-    <polygon points={`-20.5,${Y(0)} 20.5,${Y(0)} 18.5,${Y(-4)} -18.5,${Y(-4)}`} fill="#e3d29f" filter="url(#tvm-veta)" />
+    <path d={dPata} fill="#e9d9a8" filter={`url(#${idv})`} />
+    <path d={dPata} fill={`url(#${idl})`} />
+    <polygon points={`-20.5,${Y(0)} 20.5,${Y(0)} 18.5,${Y(-4)} -18.5,${Y(-4)}`} fill="#e3d29f" filter={`url(#${idv})`} />
 
     <!-- caja: marco de MDF de 3 mm -->
-    <rect x="-30.5" y={Y(40)} width="61" height="40" rx="0.8" fill="#9a6b45" filter="url(#tvm-veta)" />
+    <rect x="-30.5" y={Y(40)} width="61" height="40" rx="0.8" fill="#9a6b45" filter={`url(#${idv})`} />
     <!-- frente de madera blanca de 4 mm -->
-    <rect x="-27.4" y={Y(FT)} width="54.8" height={f(FT - 3.1)} fill="#e9d9a8" filter="url(#tvm-veta)" />
-    <rect x="-27.4" y={Y(FT)} width="54.8" height={f(FT - 3.1)} fill="url(#tvm-luz)" />
+    <rect x="-27.4" y={Y(FT)} width="54.8" height={f(FT - 3.1)} fill="#e9d9a8" filter={`url(#${idv})`} />
+    <rect x="-27.4" y={Y(FT)} width="54.8" height={f(FT - 3.1)} fill={`url(#${idl})`} />
     <!-- canto del frente (da relieve) -->
     <rect x="-27.4" y={Y(FT)} width="54.8" height={f(FT - 3.1)} fill="none" stroke="#7a5a33" stroke-opacity=".35" stroke-width=".35" />
 
@@ -111,8 +113,8 @@ const pantallaCss = {
     <!-- pieza de la perilla (MDF claro de 3 mm, en relieve) -->
     <g class="tvm-pieza">
       <rect x={f(PX - R + 0.35)} y={f(Y(arriba) + 0.5)} width="17" height={H} rx={R} fill="#000" opacity=".25" />
-      <rect x={f(PX - R)} y={Y(arriba)} width="17" height={H} rx={R} fill="#c49567" filter="url(#tvm-veta)" />
-      <rect x={f(PX - R)} y={Y(arriba)} width="17" height={H} rx={R} fill="url(#tvm-luz)" />
+      <rect x={f(PX - R)} y={Y(arriba)} width="17" height={H} rx={R} fill="#c49567" filter={`url(#${idv})`} />
+      <rect x={f(PX - R)} y={Y(arriba)} width="17" height={H} rx={R} fill={`url(#${idl})`} />
       {ranuras.map((r) => <rect x={r.x} y={r.y} width={r.w} height="1" rx=".5" fill="#140d08" />)}
     </g>
 

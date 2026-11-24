@@ -195,6 +195,26 @@ videos:
     - enlace: "[PENDIENTE: enlace del video 4]"
       titulo: "[PENDIENTE: nombre de la canción 4]"
 
+# Sección "¿Cuál Pepito es para ti?": cada versión con su personalidad.
+comparar:
+  titulo: "¿Cuál Pepito es para ti?"
+  subtitulo: "Los dos cantan, escriben y muestran tus fotos. La diferencia es a quién se lo das."
+  # Lo que traen los dos (va debajo de las dos versiones).
+  comunes: "Los dos traen decenas de canciones, mensajes, fotos, dibujos, alarmas y mucho más. Y los dos tienen batería, para llevarlo a donde quieras."
+  # Tabla de "Ver todas las diferencias": [tema, Pepito Pro, Pepito Lite].
+  # Aquí sí van los detalles exactos, para quien los quiera.
+  diferencias:
+    - ["Cómo se conecta", "Wi-Fi", "Bluetooth"]
+    - ["Desde dónde le mandas cosas", "Desde cualquier lugar", "Cerca, desde tu celular"]
+    - ["Cuenta", "Con correo o Google", "No hace falta"]
+    - ["Quién le puede enviar", "Tú y hasta 5 personas más", "Tu celular"]
+    - ["Funciona en", "Android (app), iPhone y computador (versión web)", "Android (app)"]
+    - ["Juegos", "Sí, con su rueda", "No"]
+    - ["Se actualiza solo", "Sí", "Por ahora no"]
+    - ["Pantalla", "1,3 pulgadas", "0,96 pulgadas"]
+    - ["Batería", "Sí", "Sí"]
+    - ["Canciones, mensajes, fotos, dibujos, GIF, reloj y alarmas", "Sí", "Sí"]
+
 # Las dos versiones. estado: "disponible" o "proximamente".
 versiones:
   - id: "wifi"
@@ -202,11 +222,29 @@ versiones:
     estado: "disponible"
     precio: "[PENDIENTE: precio de Pepito Pro]"
     mensajeWhatsApp: "¡Hola! Quiero un Pepito Pro 📺"
+    para: "El regalo perfecto para alguien que quieres"
+    lema: "Aunque estés lejos, lo que le mandas le llega."
+    puntos:
+      - "Le mandas lo que quieras desde cualquier lugar"
+      - "Tu familia y tus amigos también le pueden enviar cosas"
+      - "Juegos retro para pasar el rato"
+      - "Pantalla más grande, y se actualiza solo"
+    funcionaEn: "Android con la app, y iPhone o computador con la versión web"
+    # Lo que se ve en su pantallita (cortito).
+    pantalla: "Te quiero mucho"
   - id: "lite"
     nombre: "Pepito Lite"
     estado: "proximamente"
     precio: "[PENDIENTE: precio de Pepito Lite]"
     mensajeWhatsApp: "¡Hola! Me interesa Pepito Lite 📺"
+    para: "El regalo perfecto para ti"
+    lema: "Sin complicarte: lo emparejas por Bluetooth y a darle."
+    puntos:
+      - "Sin Wi-Fi ni cuenta: lo emparejas una vez y listo"
+      - "Lo que le mandas va directo de tu celular a Pepito"
+      - "Más pequeño, para el escritorio o la mesa de noche"
+    funcionaEn: "Solo Android, con la app"
+    pantalla: "¡A darle!"
 
 # Páginas legales (ya existen en la app; las de Pepito cubren Pro y Lite).
 legal:
